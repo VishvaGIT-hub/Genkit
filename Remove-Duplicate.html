@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Duplicate Lines Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .options-section {
+            background: #f8fbff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .options-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            border-color: #1976d2;
+        }
+
+        .option-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #1976d2;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .option-checkbox.checked {
+            background: #1976d2;
+        }
+
+        .option-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .option-label {
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 250px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.5;
+        }
+
+        .text-area::placeholder {
+            color: #999;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .results-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .result-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .processing-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 3px solid #e3f2fd;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .success-message, .error-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .tool-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .options-grid {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tool-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .text-area {
+                min-height: 200px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-container">
+        <div class="header">
+            <h1>🔄 Remove Duplicate Lines</h1>
+            <p>Clean up your text by removing duplicate lines instantly</p>
+        </div>
+
+        <div class="options-section">
+            <div class="options-title">
+                ⚙️ Processing Options
+            </div>
+            <div class="options-grid">
+                <div class="option-item">
+                    <div class="option-checkbox checked" id="caseSensitive" onclick="toggleOption('caseSensitive')"></div>
+                    <label class="option-label" onclick="toggleOption('caseSensitive')">Case Sensitive</label>
+                </div>
+                <div class="option-item">
+                    <div class="option-checkbox" id="trimWhitespace" onclick="toggleOption('trimWhitespace')"></div>
+                    <label class="option-label" onclick="toggleOption('trimWhitespace')">Trim Whitespace</label>
+                </div>
+                <div class="option-item">
+                    <div class="option-checkbox" id="ignoreEmpty" onclick="toggleOption('ignoreEmpty')"></div>
+                    <label class="option-label" onclick="toggleOption('ignoreEmpty')">Ignore Empty Lines</label>
+                </div>
+                <div class="option-item">
+                    <div class="option-checkbox" id="sortOutput" onclick="toggleOption('sortOutput')"></div>
+                    <label class="option-label" onclick="toggleOption('sortOutput')">Sort Output</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    📝 Input Text
+                </div>
+                <textarea 
+                    class="text-area" 
+                    id="inputText" 
+                    placeholder="Paste or type your text here... Each line will be checked for duplicates."
+                    oninput="updateInputStats()"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputLines">0 lines</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputChars">0 characters</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    📤 Output Text
+                </div>
+                <div class="output-area">
+                    <textarea 
+                        class="text-area" 
+                        id="outputText" 
+                        placeholder="Processed text will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputLines">0 lines</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🗑️</span>
+                        <span id="removedLines">0 removed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-primary" id="processBtn" onclick="removeDuplicates()">
+                🔄 Remove Duplicates
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-success" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="processing-indicator" id="processingIndicator">
+            <div class="spinner"></div>
+            Processing your text...
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-title">
+                📊 Processing Results
+            </div>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-value" id="originalCount">0</div>
+                    <div class="result-label">Original Lines</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value" id="uniqueCount">0</div>
+                    <div class="result-label">Unique Lines</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value" id="duplicateCount">0</div>
+                    <div class="result-label">Duplicates Removed</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value" id="reductionPercentage">0%</div>
+                    <div class="result-label">Size Reduction</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">⚡ Key Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-text">Fast processing of large text files</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-text">Customizable processing options</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed statistics and results</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">Fully mobile responsive design</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">Operation completed successfully!</div>
+        <div class="error-message" id="errorMessage">Please enter some text to process.</div>
+    </div>
+
+    <script>
+        let options = {
+            caseSensitive: true,
+            trimWhitespace: false,
+            ignoreEmpty: false,
+            sortOutput: false
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            
+            // Add entrance animation
+            document.querySelector('.tool-container').style.opacity = '0';
+            document.querySelector('.tool-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.tool-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.tool-container').style.opacity = '1';
+                document.querySelector('.tool-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputText').focus();
+
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            removeDuplicates();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            copyOutput();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+            });
+        });
+
+        function toggleOption(optionName) {
+            options[optionName] = !options[optionName];
+            const checkbox = document.getElementById(optionName);
+            
+            if (options[optionName]) {
+                checkbox.classList.add('checked');
+            } else {
+                checkbox.classList.remove('checked');
+            }
+
+            // Auto-process if there's content
+            const inputText = document.getElementById('inputText').value.trim();
+            if (inputText) {
+                setTimeout(removeDuplicates, 100);
+            }
+        }
+
+        function updateInputStats() {
+            const inputText = document.getElementById('inputText').value;
+            const lines = inputText ? inputText.split('\n').length : 0;
+            const chars = inputText.length;
+
+            document.getElementById('inputLines').textContent = `${lines} line${lines !== 1 ? 's' : ''}`;
+            document.getElementById('inputChars').textContent = `${chars} character${chars !== 1 ? 's' : ''}`;
+        }
+
+        function removeDuplicates() {
+            const inputText = document.getElementById('inputText').value;
+            
+            if (!inputText.trim()) {
+                showError('Please enter some text to process.');
+                return;
+            }
+
+            showProcessing();
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    const result = processText(inputText);
+                    displayResult(result);
+                    hideProcessing();
+                    showSuccess('Duplicates removed successfully!');
+                } catch (error) {
+                    hideProcessing();
+                    showError('An error occurred while processing the text.');
+                    console.error(error);
+                }
+            }, 100);
+        }
+
+        function processText(inputText) {
+            let lines = inputText.split('\n');
+            const originalCount = lines.length;
+            
+            // Apply options
+            if (options.trimWhitespace) {
+                lines = lines.map(line => line.trim());
+            }
+
+            if (options.ignoreEmpty) {
+                lines = lines.filter(line => line.length > 0);
+            }
+
+            // Remove duplicates while preserving order
+            const seen = new Set();
+            const uniqueLines = [];
+            
+            for (const line of lines) {
+                const compareKey = options.caseSensitive ? line : line.toLowerCase();
+                
+                if (!seen.has(compareKey)) {
+                    seen.add(compareKey);
+                    uniqueLines.push(line);
+                }
+            }
+
+            // Sort if option is enabled
+            if (options.sortOutput) {
+                uniqueLines.sort((a, b) => {
+                    if (options.caseSensitive) {
+                        return a.localeCompare(b);
+                    } else {
+                        return a.toLowerCase().localeCompare(b.toLowerCase());
+                    }
+                });
+            }
+
+            const outputText = uniqueLines.join('\n');
+            const uniqueCount = uniqueLines.length;
+            const duplicateCount = originalCount - uniqueCount;
+            const reductionPercentage = originalCount > 0 ? 
+                Math.round((duplicateCount / originalCount) * 100) : 0;
+
+            return {
+                outputText,
+                originalCount,
+                uniqueCount,
+                duplicateCount,
+                reductionPercentage
+            };
+        }
+
+        function displayResult(result) {
+            document.getElementById('outputText').value = result.outputText;
+            
+            // Update output stats
+            document.getElementById('outputLines').textContent = 
+                `${result.uniqueCount} line${result.uniqueCount !== 1 ? 's' : ''}`;
+            document.getElementById('removedLines').textContent = 
+                `${result.duplicateCount} removed`;
+
+            // Update results section
+            document.getElementById('originalCount').textContent = result.originalCount;
+            document.getElementById('uniqueCount').textContent = result.uniqueCount;
+            document.getElementById('duplicateCount').textContent = result.duplicateCount;
+            document.getElementById('reductionPercentage').textContent = result.reductionPercentage + '%';
+
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Enable copy button
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.classList.remove('btn-disabled');
+        }
+
+        function showProcessing() {
+            document.getElementById('processingIndicator').style.display = 'block';
+            document.getElementById('processBtn').classList.add('btn-disabled');
+            document.getElementById('processBtn').disabled = true;
+        }
+
+        function hideProcessing() {
+            document.getElementById('processingIndicator').style.display = 'none';
+            document.getElementById('processBtn').classList.remove('btn-disabled');
+            document.getElementById('processBtn').disabled = false;
+        }
+
+        async function copyOutput() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (!outputText.trim()) {
+                showError('No output to copy. Please process some text first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Output copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showSuccess('Output copied to clipboard!');
+                } catch (fallbackErr) {
+                    showError('Failed to copy. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            updateInputStats();
+            document.getElementById('outputLines').textContent = '0 lines';
+            document.getElementById('removedLines').textContent = '0 removed';
+            
+            showSuccess('All text cleared!');
+            document.getElementById('inputText').focus();
+        }
+
+        function loadSample() {
+            const sampleText = `Welcome to our website
+Contact us for more information
+Welcome to our website
+About our services
+Contact us for more information
+Privacy Policy
+Terms of Service
+About our services
+Welcome to our website
+FAQ Section
+Contact us for more information
+Newsletter signup
+Terms of Service
+Privacy Policy
+FAQ Section`;
+
+            document.getElementById('inputText').value = sampleText;
+            updateInputStats();
+            showSuccess('Sample text loaded!');
+            
+            // Auto-process the sample
+            setTimeout(removeDuplicates, 500);
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
