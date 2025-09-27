@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Case Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .converter-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-container {
+            position: relative;
+            background: #f8fbff;
+            border-radius: 15px;
+            border: 2px solid #e3f2fd;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-container:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 120px;
+            border: none;
+            outline: none;
+            font-size: 1.1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .text-input::placeholder {
+            color: #999;
+        }
+
+        .input-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #1565c0;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e3f2fd;
+        }
+
+        .conversion-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .convert-btn:hover {
+            border-color: #1976d2;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(25, 118, 210, 0.15);
+        }
+
+        .convert-btn.active {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .btn-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .convert-btn.active .btn-title {
+            color: white;
+        }
+
+        .btn-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .convert-btn.active .btn-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-example {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .convert-btn.active .btn-example {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .output-section {
+            margin-bottom: 20px;
+        }
+
+        .output-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .output-container {
+            background: #f8fbff;
+            border-radius: 15px;
+            border: 2px solid #e3f2fd;
+            padding: 20px;
+            position: relative;
+            min-height: 120px;
+        }
+
+        .text-output {
+            width: 100%;
+            min-height: 100px;
+            border: none;
+            outline: none;
+            font-size: 1.1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .output-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(45deg, #2196f3, #42a5f5);
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .tips-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .tips-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tip {
+            background: #f8fbff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            color: #666;
+            border-left: 4px solid #1976d2;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #c8e6c9;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #ffcdd2;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .converter-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .conversion-buttons {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .convert-btn {
+                padding: 15px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-actions {
+                flex-wrap: wrap;
+            }
+
+            .output-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .converter-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .input-stats {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            .text-input {
+                min-height: 100px;
+            }
+
+            .text-output {
+                min-height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="converter-container">
+        <div class="header">
+            <h1>🔤 Text Case Converter</h1>
+            <p>Transform your text into different cases instantly</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-label">
+                ✏️ Input Text
+            </div>
+            <div class="input-container">
+                <textarea 
+                    class="text-input" 
+                    id="inputText" 
+                    placeholder="Type or paste your text here..."
+                    oninput="updateStats()"
+                ></textarea>
+                <div class="input-stats">
+                    <div class="stat-item">
+                        <span>📝</span>
+                        <span id="charCount">0 characters</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="wordCount">0 words</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="lineCount">0 lines</span>
+                    </div>
+                </div>
+                <div class="input-actions">
+                    <button class="action-btn" onclick="pasteText()">📋 Paste</button>
+                    <button class="action-btn secondary" onclick="clearAll()">🗑️ Clear</button>
+                    <button class="action-btn secondary" onclick="loadSample()">📝 Sample</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="conversion-buttons">
+            <div class="convert-btn" onclick="convertText('uppercase')">
+                <div class="btn-title">🔤 UPPERCASE</div>
+                <div class="btn-description">Convert all letters to uppercase</div>
+                <div class="btn-example">Example: HELLO WORLD</div>
+            </div>
+
+            <div class="convert-btn" onclick="convertText('lowercase')">
+                <div class="btn-title">🔡 lowercase</div>
+                <div class="btn-description">Convert all letters to lowercase</div>
+                <div class="btn-example">Example: hello world</div>
+            </div>
+
+            <div class="convert-btn" onclick="convertText('titlecase')">
+                <div class="btn-title">🔠 Title Case</div>
+                <div class="btn-description">Capitalize the first letter of each word</div>
+                <div class="btn-example">Example: Hello World</div>
+            </div>
+
+            <div class="convert-btn" onclick="convertText('sentencecase')">
+                <div class="btn-title">📝 Sentence case</div>
+                <div class="btn-description">Capitalize only the first letter of sentences</div>
+                <div class="btn-example">Example: Hello world. How are you?</div>
+            </div>
+
+            <div class="convert-btn" onclick="convertText('togglecase')">
+                <div class="btn-title">🔄 tOGGLE cASE</div>
+                <div class="btn-description">Invert the case of each letter</div>
+                <div class="btn-example">Example: hELLO wORLD</div>
+            </div>
+
+            <div class="convert-btn" onclick="convertText('alternatingcase')">
+                <div class="btn-title">🌊 aLtErNaTiNg CaSe</div>
+                <div class="btn-description">Alternate between lower and upper case</div>
+                <div class="btn-example">Example: hElLo WoRlD</div>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-label">
+                📤 Output Text
+            </div>
+            <div class="output-container">
+                <textarea 
+                    class="text-output" 
+                    id="outputText" 
+                    placeholder="Converted text will appear here..."
+                    readonly
+                ></textarea>
+                <div class="output-actions">
+                    <span id="outputStats" style="color: #666; font-size: 0.9em;">Ready to convert</span>
+                    <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">
+                        📋 Copy Text
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">⚡ Key Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-text">Instant conversion as you type</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-text">Easy copy and paste functionality</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Real-time character and word count</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">Fully responsive mobile design</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <div class="tips-title">💡 Tips & Tricks</div>
+            <div class="tip">📝 Use Ctrl+V (Cmd+V on Mac) to quickly paste text into the input area.</div>
+            <div class="tip">🔄 Try different case styles to see which works best for your content.</div>
+            <div class="tip">📋 Click any conversion button multiple times to copy the result instantly.</div>
+            <div class="tip">⚡ The tool works offline - no internet connection required for conversions.</div>
+        </div>
+
+        <div class="success-message" id="successMessage">Text copied to clipboard!</div>
+        <div class="error-message" id="errorMessage">Please enter some text to convert.</div>
+    </div>
+
+    <script>
+        let currentConversion = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            
+            // Add entrance animation
+            document.querySelector('.converter-container').style.opacity = '0';
+            document.querySelector('.converter-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.converter-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.converter-container').style.opacity = '1';
+                document.querySelector('.converter-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'u':
+                            e.preventDefault();
+                            convertText('uppercase');
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            convertText('lowercase');
+                            break;
+                        case 't':
+                            e.preventDefault();
+                            convertText('titlecase');
+                            break;
+                        case 's':
+                            e.preventDefault();
+                            convertText('sentencecase');
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            convertText('togglecase');
+                            break;
+                        case 'a':
+                            if (e.altKey) {
+                                e.preventDefault();
+                                convertText('alternatingcase');
+                            }
+                            break;
+                    }
+                }
+            });
+        });
+
+        function updateStats() {
+            const inputText = document.getElementById('inputText').value;
+            const charCount = inputText.length;
+            const wordCount = inputText.trim() === '' ? 0 : inputText.trim().split(/\s+/).length;
+            const lineCount = inputText === '' ? 0 : inputText.split('\n').length;
+
+            document.getElementById('charCount').textContent = `${charCount} character${charCount !== 1 ? 's' : ''}`;
+            document.getElementById('wordCount').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''}`;
+            document.getElementById('lineCount').textContent = `${lineCount} line${lineCount !== 1 ? 's' : ''}`;
+
+            // Auto-convert if a conversion type is active
+            if (currentConversion && inputText.trim() !== '') {
+                performConversion(currentConversion, inputText);
+            } else if (inputText.trim() === '') {
+                document.getElementById('outputText').value = '';
+                document.getElementById('outputStats').textContent = 'Ready to convert';
+            }
+        }
+
+        function convertText(type) {
+            const inputText = document.getElementById('inputText').value;
+            
+            if (inputText.trim() === '') {
+                showError('Please enter some text to convert.');
+                return;
+            }
+
+            // Update active button
+            document.querySelectorAll('.convert-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            currentConversion = type;
+            performConversion(type, inputText);
+        }
+
+        function performConversion(type, text) {
+            let convertedText = '';
+
+            switch(type) {
+                case 'uppercase':
+                    convertedText = text.toUpperCase();
+                    break;
+                
+                case 'lowercase':
+                    convertedText = text.toLowerCase();
+                    break;
+                
+                case 'titlecase':
+                    convertedText = text.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
+                    break;
+                
+                case 'sentencecase':
+                    convertedText = text.toLowerCase().replace(/(^\w|[.!?]\s+\w)/g, letter => letter.toUpperCase());
+                    break;
+                
+                case 'togglecase':
+                    convertedText = text.split('').map(char => {
+                        return char === char.toLowerCase() ? char.toUpperCase() : char.toLowerCase();
+                    }).join('');
+                    break;
+                
+                case 'alternatingcase':
+                    let shouldBeUpper = false;
+                    convertedText = text.split('').map(char => {
+                        if (char.match(/[a-zA-Z]/)) {
+                            const result = shouldBeUpper ? char.toUpperCase() : char.toLowerCase();
+                            shouldBeUpper = !shouldBeUpper;
+                            return result;
+                        }
+                        return char;
+                    }).join('');
+                    break;
+                
+                default:
+                    convertedText = text;
+            }
+
+            document.getElementById('outputText').value = convertedText;
+            updateOutputStats(convertedText);
+        }
+
+        function updateOutputStats(text) {
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            document.getElementById('outputStats').textContent = 
+                `${charCount} characters, ${wordCount} words`;
+        }
+
+        async function copyToClipboard() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (outputText.trim() === '') {
+                showError('No text to copy. Please convert some text first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Text copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = '✅ Copied!';
+                
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = '📋 Copy Text';
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showSuccess('Text copied to clipboard!');
+                } catch (fallbackErr) {
+                    showError('Failed to copy text. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('inputText').value = text;
+                updateStats();
+                showSuccess('Text pasted successfully!');
+            } catch (err) {
+                showError('Failed to paste. Please use Ctrl+V to paste manually.');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            currentConversion = '';
+            
+            // Remove active states
+            document.querySelectorAll('.convert-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateStats();
+            document.getElementById('outputStats').textContent = 'Ready to convert';
+            showSuccess('All text cleared!');
+        }
+
+        function loadSample() {
+            const sampleText = "Hello World! This is a SAMPLE text with Different Cases. How are you doing today? This should help you TEST the various conversion options available.";
+            document.getElementById('inputText').value = sampleText;
+            updateStats();
+            showSuccess('Sample text loaded!');
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // Auto-focus input on load
+        window.addEventListener('load', function() {
+            document.getElementById('inputText').focus();
+        });
+    </script>
+</body>
+</html>
