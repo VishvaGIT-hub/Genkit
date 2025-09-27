@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meta Tag Analyzer</title>
+    <title>Word Counter Tool</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -48,7 +48,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 1fr 400px;
             gap: 30px;
             padding: 30px;
         }
@@ -57,10 +57,9 @@
             background: #f8f9fa;
             border-radius: 12px;
             padding: 25px;
-            height: fit-content;
         }
 
-        .results-panel {
+        .stats-panel {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 25px;
@@ -75,7 +74,7 @@
             padding-bottom: 8px;
         }
 
-        .url-input-section {
+        .text-input-section {
             background: white;
             border-radius: 8px;
             padding: 20px;
@@ -84,97 +83,74 @@
             transition: border-color 0.3s ease;
         }
 
-        .url-input-section:focus-within {
+        .text-input-section:focus-within {
             border-color: #007bff;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .input-label {
             font-weight: 600;
             color: #007bff;
-            margin-bottom: 10px;
-            display: block;
         }
 
-        .url-input-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+        .live-counter {
+            font-size: 0.9rem;
+            color: #6c757d;
         }
 
-        #urlInput {
-            flex: 1;
-            padding: 12px;
+        #textInput {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
             border: 2px solid #e9ecef;
             border-radius: 6px;
             font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
             transition: border-color 0.3s ease;
+            font-family: inherit;
         }
 
-        #urlInput:focus {
+        #textInput:focus {
             border-color: #007bff;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
-        .cors-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .cors-notice-title {
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 8px;
-        }
-
-        .cors-notice-text {
-            color: #856404;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .demo-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-            margin-bottom: 20px;
-        }
-
-        .demo-title {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 15px;
-        }
-
-        .demo-urls {
+        .quick-actions {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
 
-        .demo-url {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+        .quick-btn {
+            background: #e9ecef;
+            border: none;
             border-radius: 4px;
-            padding: 10px 12px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
         }
 
-        .demo-url:hover {
-            border-color: #007bff;
-            background: #e3f2fd;
+        .quick-btn:hover {
+            background: #007bff;
+            color: white;
         }
 
         .actions {
             display: flex;
-            flex-direction: column;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -187,8 +163,10 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
+            flex: 1;
+            justify-content: center;
+            min-width: 120px;
         }
 
         .btn-primary {
@@ -200,13 +178,6 @@
             background: #0056b3;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-        }
-
-        .btn-primary:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
         .btn-success {
@@ -231,293 +202,47 @@
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-            color: #007bff;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e9ecef;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .analysis-results {
-            display: none;
-        }
-
-        .analysis-results.show {
-            display: block;
-        }
-
-        .page-overview {
+        .stat-card {
             background: white;
             border-radius: 8px;
             padding: 20px;
             border: 2px solid #e9ecef;
-            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .page-title {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 8px;
-            font-size: 1.2rem;
+        .stat-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
         }
 
-        .page-url {
-            font-family: 'Courier New', monospace;
-            color: #6c757d;
-            font-size: 0.9rem;
-            word-break: break-all;
-            margin-bottom: 15px;
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
 
-        .seo-score {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .score-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        .stat-value {
+            font-size: 2rem;
             font-weight: 700;
-            color: white;
-        }
-
-        .score-excellent {
-            background: #28a745;
-        }
-
-        .score-good {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .score-poor {
-            background: #dc3545;
-        }
-
-        .score-info {
-            flex: 1;
-        }
-
-        .score-label {
-            font-weight: 600;
             color: #007bff;
             margin-bottom: 5px;
         }
 
-        .score-description {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .stat-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-
-        .stat-value {
-            font-weight: 700;
-            color: #007bff;
-            font-size: 1.2rem;
-        }
-
         .stat-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-
-        .meta-tags-grid {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .meta-tag-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .meta-tag-card:hover {
-            border-color: #007bff;
-            transform: translateY(-2px);
-        }
-
-        .meta-tag-card.excellent {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        .meta-tag-card.good {
-            border-color: #ffc107;
-            background: #fff3cd;
-        }
-
-        .meta-tag-card.poor {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .meta-tag-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .meta-tag-name {
-            font-weight: 600;
-            color: #007bff;
-            font-size: 1.1rem;
-        }
-
-        .meta-tag-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-excellent {
-            background: #28a745;
-            color: white;
-        }
-
-        .status-good {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .status-poor {
-            background: #dc3545;
-            color: white;
-        }
-
-        .status-missing {
-            background: #6c757d;
-            color: white;
-        }
-
-        .meta-tag-content {
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #e9ecef;
-        }
-
-        .content-text {
-            font-family: 'Courier New', monospace;
-            color: #333;
             font-size: 0.9rem;
-            line-height: 1.5;
-            word-break: break-word;
-        }
-
-        .content-empty {
             color: #6c757d;
-            font-style: italic;
-        }
-
-        .meta-tag-analysis {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .analysis-item {
-            text-align: center;
-            padding: 8px;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
-        }
-
-        .analysis-value {
             font-weight: 600;
-            color: #007bff;
         }
 
-        .analysis-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-
-        .recommendations {
-            background: #e3f2fd;
-            border: 1px solid #007bff;
-            border-radius: 6px;
-            padding: 12px;
-        }
-
-        .recommendations-title {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .recommendation-list {
-            list-style: none;
-        }
-
-        .recommendation-list li {
-            color: #0056b3;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .recommendation-list li::before {
-            content: "💡";
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        .source-viewer {
+        .detailed-stats {
             background: white;
             border-radius: 8px;
             padding: 20px;
@@ -525,57 +250,63 @@
             margin-bottom: 20px;
         }
 
-        .source-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .source-title {
+        .detailed-title {
             font-weight: 600;
             color: #007bff;
-        }
-
-        .source-actions {
+            margin-bottom: 15px;
             display: flex;
+            align-items: center;
             gap: 8px;
         }
 
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            border-radius: 4px;
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
         }
 
-        .source-code {
-            background: #1e1e1e;
-            border-radius: 6px;
-            padding: 15px;
-            max-height: 400px;
-            overflow-y: auto;
+        .detail-row:last-child {
+            border-bottom: none;
         }
 
-        .source-code pre {
-            color: #f8f8f2;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            margin: 0;
+        .detail-label {
+            color: #6c757d;
+            font-size: 0.9rem;
         }
 
-        .html-tag {
-            color: #f92672;
+        .detail-value {
+            font-weight: 600;
+            color: #007bff;
         }
 
-        .html-attr {
-            color: #66d9ef;
+        .reading-time {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .html-value {
-            color: #a6e22e;
+        .reading-time-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .reading-time-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .reading-note {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 8px;
+            font-style: italic;
         }
 
         .export-section {
@@ -593,8 +324,50 @@
 
         .export-actions {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            flex-wrap: wrap;
+        }
+
+        .frequency-analysis {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .frequency-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .word-item:last-child {
+            border-bottom: none;
+        }
+
+        .word-text {
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+
+        .word-count {
+            background: #007bff;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .notification {
@@ -621,16 +394,15 @@
             background: #dc3545;
         }
 
-        .notification.warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
         /* Mobile Responsive */
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
                 gap: 20px;
+            }
+
+            .stats-panel {
+                order: -1;
             }
         }
 
@@ -652,35 +424,25 @@
                 padding: 20px;
             }
 
-            .url-input-container {
-                flex-direction: column;
-            }
-
-            .seo-score {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .quick-stats {
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
 
-            .meta-tag-header {
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .input-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
-            .meta-tag-analysis {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .export-actions {
-                flex-direction: column;
-            }
-
-            .source-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .quick-actions {
+                justify-content: center;
             }
         }
 
@@ -698,12 +460,12 @@
             }
 
             .input-panel,
-            .results-panel {
+            .stats-panel {
                 padding: 20px;
             }
 
-            .meta-tag-analysis {
-                grid-template-columns: 1fr;
+            #textInput {
+                min-height: 200px;
             }
         }
     </style>
@@ -711,117 +473,134 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔍 Meta Tag Analyzer</h1>
-            <p>Comprehensive SEO analysis of webpage meta tags with optimization recommendations</p>
+            <h1>📝 Word Counter Tool</h1>
+            <p>Analyze your text with comprehensive word count, character analysis, and reading time estimation</p>
         </div>
 
         <div class="main-content">
             <div class="input-panel">
-                <div class="section-title">URL Analysis</div>
-
-                <div class="cors-notice">
-                    <div class="cors-notice-title">⚠️ Important Notice</div>
-                    <div class="cors-notice-text">
-                        Due to browser security restrictions (CORS), this tool demonstrates functionality using sample data. 
-                        In a production environment, server-side implementation would be required for live URL analysis.
-                    </div>
-                </div>
+                <div class="section-title">Text Analysis</div>
                 
-                <div class="url-input-section">
-                    <label class="input-label">🌐 Enter Website URL</label>
-                    <div class="url-input-container">
-                        <input type="url" id="urlInput" placeholder="https://example.com" value="">
+                <div class="text-input-section">
+                    <div class="input-header">
+                        <div class="input-label">📄 Enter Your Text</div>
+                        <div class="live-counter" id="liveCounter">0 words, 0 characters</div>
                     </div>
-                </div>
+                    <textarea id="textInput" placeholder="Start typing or paste your text here to see real-time word count and analysis...
 
-                <div class="demo-section">
-                    <div class="demo-title">📋 Sample Analyses</div>
-                    <div class="demo-urls">
-                        <div class="demo-url" data-demo="excellent">🟢 Excellent SEO Example</div>
-                        <div class="demo-url" data-demo="good">🟡 Good SEO (Minor Issues)</div>
-                        <div class="demo-url" data-demo="poor">🔴 Poor SEO (Needs Work)</div>
-                        <div class="demo-url" data-demo="ecommerce">🛒 E-commerce Site</div>
-                        <div class="demo-url" data-demo="blog">📝 Blog Article</div>
+Try pasting an article, essay, or any text content to get detailed statistics including:
+• Word and character counts
+• Reading time estimation  
+• Sentence and paragraph analysis
+• Most frequently used words"></textarea>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="wordCounter.insertSample('article')">Sample Article</button>
+                        <button class="quick-btn" onclick="wordCounter.insertSample('essay')">Sample Essay</button>
+                        <button class="quick-btn" onclick="wordCounter.insertSample('business')">Business Text</button>
+                        <button class="quick-btn" onclick="wordCounter.insertSample('creative')">Creative Writing</button>
                     </div>
                 </div>
 
                 <div class="actions">
-                    <button class="btn btn-primary" id="analyzeBtn">
-                        <span>🔍</span> Analyze Meta Tags
+                    <button class="btn btn-success" id="copyResultsBtn">
+                        <span>📋</span> Copy Results
                     </button>
                     <button class="btn btn-secondary" id="clearBtn">
-                        <span>🗑️</span> Clear Results
+                        <span>🗑️</span> Clear Text
                     </button>
                 </div>
             </div>
 
-            <div class="results-panel">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <div>Analyzing meta tags and SEO elements...</div>
+            <div class="stats-panel">
+                <div class="section-title">Text Statistics</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-value" id="wordCount">0</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔤</div>
+                        <div class="stat-value" id="charCount">0</div>
+                        <div class="stat-label">Characters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📏</div>
+                        <div class="stat-value" id="charCountNoSpaces">0</div>
+                        <div class="stat-label">Chars (No Spaces)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-value" id="sentenceCount">0</div>
+                        <div class="stat-label">Sentences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📑</div>
+                        <div class="stat-value" id="paragraphCount">0</div>
+                        <div class="stat-label">Paragraphs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="avgWordsPerSentence">0</div>
+                        <div class="stat-label">Avg Words/Sentence</div>
+                    </div>
                 </div>
 
-                <div class="analysis-results" id="analysisResults">
-                    <div class="section-title">Analysis Results</div>
-                    
-                    <div class="page-overview">
-                        <div class="page-title" id="pageTitle">Sample Website Analysis</div>
-                        <div class="page-url" id="pageUrl">https://example.com</div>
-                        
-                        <div class="seo-score">
-                            <div class="score-circle" id="scoreCircle">85</div>
-                            <div class="score-info">
-                                <div class="score-label">SEO Score</div>
-                                <div class="score-description" id="scoreDescription">Good - Minor improvements needed</div>
-                            </div>
-                        </div>
+                <div class="reading-time">
+                    <div class="reading-time-value" id="readingTime">0 min</div>
+                    <div class="reading-time-label">📖 Estimated Reading Time</div>
+                    <div class="reading-note">Based on 200 words per minute</div>
+                </div>
 
-                        <div class="quick-stats">
-                            <div class="stat-item">
-                                <div class="stat-value" id="totalTags">8</div>
-                                <div class="stat-label">Meta Tags</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="passedTags">6</div>
-                                <div class="stat-label">Passed</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="issuesCount">2</div>
-                                <div class="stat-label">Issues</div>
-                            </div>
+                <div class="detailed-stats">
+                    <div class="detailed-title">
+                        <span>📈</span> Detailed Analysis
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Longest word</span>
+                        <span class="detail-value" id="longestWord">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Average word length</span>
+                        <span class="detail-value" id="avgWordLength">0</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Most common word</span>
+                        <span class="detail-value" id="mostCommonWord">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Unique words</span>
+                        <span class="detail-value" id="uniqueWords">0</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Lexical diversity</span>
+                        <span class="detail-value" id="lexicalDiversity">0%</span>
+                    </div>
+                </div>
+
+                <div class="frequency-analysis" id="frequencyAnalysis">
+                    <div class="frequency-title">🔤 Most Frequent Words</div>
+                    <div id="wordFrequencyList">
+                        <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                            Enter text to see word frequency analysis
                         </div>
                     </div>
+                </div>
 
-                    <div class="meta-tags-grid" id="metaTagsGrid">
-                        <!-- Meta tag cards will be populated here -->
-                    </div>
-
-                    <div class="source-viewer">
-                        <div class="source-header">
-                            <div class="source-title">📄 HTML Meta Tags Source</div>
-                            <div class="source-actions">
-                                <button class="btn btn-success btn-small" id="copySourceBtn">📋 Copy</button>
-                                <button class="btn btn-secondary btn-small" id="downloadSourceBtn">💾 Download</button>
-                            </div>
-                        </div>
-                        <div class="source-code">
-                            <pre id="sourceCode"><!-- Meta tags source will appear here --></pre>
-                        </div>
-                    </div>
-
-                    <div class="export-section">
-                        <div class="export-title">📤 Export Analysis</div>
-                        <div class="export-actions">
-                            <button class="btn btn-success" id="exportReportBtn">
-                                <span>📊</span> Full Report
-                            </button>
-                            <button class="btn btn-success" id="exportJsonBtn">
-                                <span>📄</span> JSON Data
-                            </button>
-                            <button class="btn btn-success" id="exportCsvBtn">
-                                <span>📋</span> CSV Export
-                            </button>
-                        </div>
+                <div class="export-section">
+                    <div class="export-title">📤 Export Options</div>
+                    <div class="export-actions">
+                        <button class="btn btn-success" id="exportTxtBtn">
+                            <span>📄</span> Export as TXT
+                        </button>
+                        <button class="btn btn-success" id="exportCsvBtn">
+                            <span>📊</span> Export as CSV
+                        </button>
+                        <button class="btn btn-success" id="exportJsonBtn">
+                            <span>📋</span> Export as JSON
+                        </button>
                     </div>
                 </div>
             </div>
@@ -829,606 +608,390 @@
     </div>
 
     <div id="notification" class="notification">
-        Analysis completed successfully!
+        Action completed successfully!
     </div>
 
     <script>
-        class MetaTagAnalyzer {
+        class WordCounter {
             constructor() {
-                this.currentAnalysis = null;
-                this.sampleData = this.generateSampleData();
+                this.textInput = document.getElementById('textInput');
+                this.currentStats = {};
                 
+                this.sampleTexts = {
+                    article: `Technology has revolutionized the way we communicate, work, and live. From smartphones to artificial intelligence, digital innovations continue to shape our daily experiences. The rapid pace of technological advancement brings both opportunities and challenges that society must navigate carefully.
+
+Social media platforms have transformed how we connect with others, enabling instant communication across vast distances. However, this connectivity also raises concerns about privacy, misinformation, and the impact on mental health. As we embrace new technologies, it becomes crucial to maintain a balance between digital engagement and real-world interactions.
+
+The future promises even more exciting developments, including autonomous vehicles, quantum computing, and advanced medical treatments. These innovations have the potential to solve complex problems and improve quality of life for millions of people worldwide.`,
+
+                    essay: `Education plays a fundamental role in shaping individuals and society. It serves as the foundation for personal growth, critical thinking, and professional development. Throughout history, access to quality education has been a key factor in determining social mobility and economic prosperity.
+
+Modern educational systems face numerous challenges, including adapting to technological changes, addressing diverse learning needs, and ensuring equitable access for all students. The COVID-19 pandemic highlighted both the importance of education and the need for flexible, innovative approaches to learning.
+
+As we move forward, educational institutions must continue to evolve, incorporating new methodologies and technologies while maintaining their core mission of fostering knowledge, creativity, and responsible citizenship. The investment in education today will determine the leaders, innovators, and problem-solvers of tomorrow.`,
+
+                    business: `Our company's quarterly performance exceeded expectations, with revenue increasing by 15% compared to the same period last year. This growth can be attributed to successful product launches, expanded market reach, and improved operational efficiency.
+
+Key achievements include the introduction of three new product lines, establishment of partnerships in emerging markets, and implementation of advanced analytics systems. Customer satisfaction scores reached an all-time high of 94%, reflecting our commitment to quality and service excellence.
+
+Looking ahead, we plan to invest in research and development, expand our digital presence, and strengthen our sustainability initiatives. These strategic investments will position us for continued growth while maintaining our competitive advantage in the marketplace.`,
+
+                    creative: `The old lighthouse stood sentinel against the storm, its beacon cutting through the darkness like a sword of hope. Sarah watched from her cottage window as waves crashed against the rocky shore, each one telling a story of distant lands and forgotten dreams.
+
+She remembered her grandfather's tales of the sea, how he would describe the lighthouse keeper's lonely vigil through countless nights. The light had guided ships safely home for over a century, a constant guardian in an ever-changing world.
+
+As dawn approached, the storm began to subside. The lighthouse beam continued its faithful rotation, reminding Sarah that some things endure despite the chaos around them. She smiled, knowing that tomorrow would bring new stories to tell.`
+                };
+
                 this.initEventListeners();
+                this.updateStats();
             }
 
             initEventListeners() {
-                // Main action buttons
-                document.getElementById('analyzeBtn').addEventListener('click', () => {
-                    this.analyzeUrl();
+                // Real-time text analysis
+                this.textInput.addEventListener('input', () => {
+                    this.updateStats();
+                });
+
+                // Action buttons
+                document.getElementById('copyResultsBtn').addEventListener('click', () => {
+                    this.copyResults();
                 });
 
                 document.getElementById('clearBtn').addEventListener('click', () => {
-                    this.clearResults();
+                    this.clearText();
                 });
 
-                // Demo buttons
-                document.querySelectorAll('.demo-url').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.loadSampleAnalysis(e.target.dataset.demo);
-                    });
-                });
-
-                // Source code actions
-                document.getElementById('copySourceBtn').addEventListener('click', () => {
-                    this.copySourceCode();
-                });
-
-                document.getElementById('downloadSourceBtn').addEventListener('click', () => {
-                    this.downloadSourceCode();
-                });
-
-                // Export actions
-                document.getElementById('exportReportBtn').addEventListener('click', () => {
-                    this.exportFullReport();
-                });
-
-                document.getElementById('exportJsonBtn').addEventListener('click', () => {
-                    this.exportJsonData();
+                // Export buttons
+                document.getElementById('exportTxtBtn').addEventListener('click', () => {
+                    this.exportResults('txt');
                 });
 
                 document.getElementById('exportCsvBtn').addEventListener('click', () => {
-                    this.exportCsvData();
+                    this.exportResults('csv');
                 });
 
-                // URL input validation
-                document.getElementById('urlInput').addEventListener('input', (e) => {
-                    this.validateUrlInput(e.target.value);
+                document.getElementById('exportJsonBtn').addEventListener('click', () => {
+                    this.exportResults('json');
                 });
-            }
 
-            generateSampleData() {
-                return {
-                    excellent: {
-                        url: 'https://excellent-seo-example.com',
-                        title: 'Professional SEO Services - Boost Your Rankings | SEO Experts',
-                        score: 95,
-                        metaTags: {
-                            title: {
-                                content: 'Professional SEO Services - Boost Your Rankings | SEO Experts',
-                                length: 61,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            description: {
-                                content: 'Boost your website rankings with our professional SEO services. Expert keyword research, on-page optimization, and proven strategies to increase organic traffic.',
-                                length: 154,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            keywords: {
-                                content: 'SEO services, search engine optimization, keyword research, organic traffic, website rankings',
-                                length: 98,
-                                status: 'good',
-                                recommendations: []
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:title': {
-                                content: 'Professional SEO Services - Boost Your Rankings',
-                                length: 47,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:description': {
-                                content: 'Expert SEO services to boost your website rankings and increase organic traffic.',
-                                length: 81,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:image': {
-                                content: 'https://excellent-seo-example.com/images/seo-services.jpg',
-                                length: 58,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'twitter:card': {
-                                content: 'summary_large_image',
-                                length: 19,
-                                status: 'excellent',
-                                recommendations: []
-                            }
-                        }
-                    },
-                    good: {
-                        url: 'https://good-seo-example.com',
-                        title: 'Web Design Company - Creative Solutions',
-                        score: 78,
-                        metaTags: {
-                            title: {
-                                content: 'Web Design Company - Creative Solutions',
-                                length: 38,
-                                status: 'good',
-                                recommendations: ['Consider adding your brand name and location for better SEO']
-                            },
-                            description: {
-                                content: 'We create beautiful, responsive websites that help your business grow online.',
-                                length: 78,
-                                status: 'good',
-                                recommendations: ['Description could be longer for better SEO (aim for 120-160 characters)']
-                            },
-                            keywords: {
-                                content: 'web design, responsive websites, business websites',
-                                length: 51,
-                                status: 'good',
-                                recommendations: []
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:title': {
-                                content: 'Web Design Company',
-                                length: 18,
-                                status: 'good',
-                                recommendations: ['Consider making OpenGraph title more descriptive']
-                            },
-                            'og:description': {
-                                content: 'Creative web design solutions',
-                                length: 28,
-                                status: 'good',
-                                recommendations: ['OpenGraph description should be more detailed']
-                            }
-                        }
-                    },
-                    poor: {
-                        url: 'https://poor-seo-example.com',
-                        title: 'Home',
-                        score: 35,
-                        metaTags: {
-                            title: {
-                                content: 'Home',
-                                length: 4,
-                                status: 'poor',
-                                recommendations: ['Title is too short and not descriptive', 'Include your brand name and main keywords']
-                            },
-                            description: {
-                                content: '',
-                                length: 0,
-                                status: 'missing',
-                                recommendations: ['Meta description is missing - add a compelling 120-160 character description']
-                            },
-                            keywords: {
-                                content: '',
-                                length: 0,
-                                status: 'missing',
-                                recommendations: ['Add relevant keywords for your content']
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37,
-                                status: 'excellent',
-                                recommendations: []
-                            }
-                        }
-                    },
-                    ecommerce: {
-                        url: 'https://shop-example.com/wireless-headphones',
-                        title: 'Wireless Headphones - Premium Audio | ShopExample',
-                        score: 88,
-                        metaTags: {
-                            title: {
-                                content: 'Wireless Headphones - Premium Audio | ShopExample',
-                                length: 50,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            description: {
-                                content: 'Shop premium wireless headphones with noise cancellation, 30-hour battery, and crystal-clear sound. Free shipping on orders over $50.',
-                                length: 138,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            keywords: {
-                                content: 'wireless headphones, bluetooth headphones, noise cancellation, premium audio, online shopping',
-                                length: 102,
-                                status: 'good',
-                                recommendations: []
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:title': {
-                                content: 'Wireless Headphones - Premium Audio',
-                                length: 35,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:description': {
-                                content: 'Premium wireless headphones with advanced features and exceptional sound quality.',
-                                length: 82,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:image': {
-                                content: 'https://shop-example.com/images/headphones-main.jpg',
-                                length: 52,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:type': {
-                                content: 'product',
-                                length: 7,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'twitter:card': {
-                                content: 'summary_large_image',
-                                length: 19,
-                                status: 'excellent',
-                                recommendations: []
-                            }
-                        }
-                    },
-                    blog: {
-                        url: 'https://blog-example.com/seo-tips-2024',
-                        title: '10 Essential SEO Tips for 2024 - Complete Guide',
-                        score: 82,
-                        metaTags: {
-                            title: {
-                                content: '10 Essential SEO Tips for 2024 - Complete Guide',
-                                length: 47,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            description: {
-                                content: 'Discover the top 10 SEO strategies for 2024. Learn advanced techniques to improve your search rankings and drive more organic traffic to your website.',
-                                length: 149,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            keywords: {
-                                content: 'SEO tips, search engine optimization, 2024 SEO strategies, organic traffic, search rankings',
-                                length: 94,
-                                status: 'good',
-                                recommendations: []
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:title': {
-                                content: '10 Essential SEO Tips for 2024',
-                                length: 30,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:description': {
-                                content: 'Complete guide to the most effective SEO strategies for 2024.',
-                                length: 61,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'og:type': {
-                                content: 'article',
-                                length: 7,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'article:author': {
-                                content: 'John Smith',
-                                length: 10,
-                                status: 'excellent',
-                                recommendations: []
-                            },
-                            'twitter:card': {
-                                content: 'summary',
-                                length: 7,
-                                status: 'good',
-                                recommendations: ['Consider using "summary_large_image" for better engagement']
-                            }
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'l') {
+                            e.preventDefault();
+                            this.clearText();
                         }
                     }
-                };
-            }
-
-            validateUrlInput(url) {
-                const analyzeBtn = document.getElementById('analyzeBtn');
-                
-                if (!url.trim()) {
-                    analyzeBtn.disabled = true;
-                    return;
-                }
-
-                try {
-                    new URL(url);
-                    analyzeBtn.disabled = false;
-                } catch {
-                    analyzeBtn.disabled = false; // Allow analysis of sample data
-                }
-            }
-
-            async analyzeUrl() {
-                const url = document.getElementById('urlInput').value.trim();
-                
-                if (!url) {
-                    this.showNotification('Please enter a URL to analyze', 'error');
-                    return;
-                }
-
-                this.showLoading();
-
-                // Simulate API call delay
-                setTimeout(() => {
-                    // For demo purposes, use sample data
-                    this.loadSampleAnalysis('excellent');
-                    this.showNotification('Analysis completed! (Using sample data due to CORS restrictions)', 'warning');
-                }, 2000);
-            }
-
-            loadSampleAnalysis(type) {
-                const sampleData = this.sampleData[type];
-                if (!sampleData) {
-                    this.showNotification('Sample data not found', 'error');
-                    return;
-                }
-
-                this.showLoading();
-
-                setTimeout(() => {
-                    this.currentAnalysis = sampleData;
-                    this.displayAnalysisResults();
-                    this.hideLoading();
-                    this.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} SEO example loaded!`);
-                }, 1000);
-            }
-
-            displayAnalysisResults() {
-                if (!this.currentAnalysis) return;
-
-                // Update page overview
-                document.getElementById('pageTitle').textContent = this.currentAnalysis.title;
-                document.getElementById('pageUrl').textContent = this.currentAnalysis.url;
-
-                // Update SEO score
-                this.updateSeoScore(this.currentAnalysis.score);
-
-                // Update statistics
-                this.updateStatistics();
-
-                // Display meta tags
-                this.displayMetaTags();
-
-                // Generate source code
-                this.generateSourceCode();
-
-                // Show results
-                document.getElementById('analysisResults').classList.add('show');
-            }
-
-            updateSeoScore(score) {
-                const scoreCircle = document.getElementById('scoreCircle');
-                const scoreDescription = document.getElementById('scoreDescription');
-
-                scoreCircle.textContent = score;
-
-                if (score >= 90) {
-                    scoreCircle.className = 'score-circle score-excellent';
-                    scoreDescription.textContent = 'Excellent - Great SEO optimization!';
-                } else if (score >= 70) {
-                    scoreCircle.className = 'score-circle score-good';
-                    scoreDescription.textContent = 'Good - Minor improvements recommended';
-                } else {
-                    scoreCircle.className = 'score-circle score-poor';
-                    scoreDescription.textContent = 'Needs Work - Significant improvements needed';
-                }
-            }
-
-            updateStatistics() {
-                const metaTags = this.currentAnalysis.metaTags;
-                const totalTags = Object.keys(metaTags).length;
-                const passedTags = Object.values(metaTags).filter(tag => tag.status === 'excellent').length;
-                const issuesCount = totalTags - passedTags;
-
-                document.getElementById('totalTags').textContent = totalTags;
-                document.getElementById('passedTags').textContent = passedTags;
-                document.getElementById('issuesCount').textContent = issuesCount;
-            }
-
-            displayMetaTags() {
-                const grid = document.getElementById('metaTagsGrid');
-                grid.innerHTML = '';
-
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, tag]) => {
-                    const card = this.createMetaTagCard(name, tag);
-                    grid.appendChild(card);
                 });
             }
 
-            createMetaTagCard(name, tag) {
-                const card = document.createElement('div');
-                card.className = `meta-tag-card ${tag.status}`;
-
-                const statusLabels = {
-                    excellent: 'EXCELLENT',
-                    good: 'GOOD',
-                    poor: 'POOR',
-                    missing: 'MISSING'
-                };
-
-                const recommendations = tag.recommendations && tag.recommendations.length > 0 ? `
-                    <div class="recommendations">
-                        <div class="recommendations-title">💡 Recommendations</div>
-                        <ul class="recommendation-list">
-                            ${tag.recommendations.map(rec => `<li>${this.escapeHtml(rec)}</li>`).join('')}
-                        </ul>
-                    </div>
-                ` : '';
-
-                card.innerHTML = `
-                    <div class="meta-tag-header">
-                        <div class="meta-tag-name">${this.escapeHtml(name)}</div>
-                        <div class="meta-tag-status status-${tag.status}">
-                            ${statusLabels[tag.status]}
-                        </div>
-                    </div>
-                    
-                    <div class="meta-tag-content">
-                        <div class="content-text ${!tag.content ? 'content-empty' : ''}">
-                            ${tag.content ? this.escapeHtml(tag.content) : 'No content provided'}
-                        </div>
-                    </div>
-                    
-                    <div class="meta-tag-analysis">
-                        <div class="analysis-item">
-                            <div class="analysis-value">${tag.length}</div>
-                            <div class="analysis-label">Characters</div>
-                        </div>
-                        <div class="analysis-item">
-                            <div class="analysis-value">${tag.content ? tag.content.split(' ').length : 0}</div>
-                            <div class="analysis-label">Words</div>
-                        </div>
-                        <div class="analysis-item">
-                            <div class="analysis-value">${this.getOptimalRange(name)}</div>
-                            <div class="analysis-label">Optimal</div>
-                        </div>
-                    </div>
-                    
-                    ${recommendations}
-                `;
-
-                return card;
+            insertSample(type) {
+                this.textInput.value = this.sampleTexts[type] || '';
+                this.updateStats();
+                this.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} sample loaded!`);
             }
 
-            getOptimalRange(tagName) {
-                const ranges = {
-                    title: '30-60',
-                    description: '120-160',
-                    keywords: '50-100',
-                    'og:title': '30-95',
-                    'og:description': '30-200'
+            updateStats() {
+                const text = this.textInput.value;
+                
+                // Basic counts
+                const words = this.countWords(text);
+                const characters = text.length;
+                const charactersNoSpaces = text.replace(/\s/g, '').length;
+                const sentences = this.countSentences(text);
+                const paragraphs = this.countParagraphs(text);
+
+                // Advanced analysis
+                const wordArray = this.getWordsArray(text);
+                const avgWordsPerSentence = sentences > 0 ? Math.round(words / sentences) : 0;
+                const readingTime = this.calculateReadingTime(words);
+                const longestWord = this.findLongestWord(wordArray);
+                const avgWordLength = this.calculateAverageWordLength(wordArray);
+                const wordFrequency = this.analyzeWordFrequency(wordArray);
+                const uniqueWords = Object.keys(wordFrequency).length;
+                const lexicalDiversity = words > 0 ? Math.round((uniqueWords / words) * 100) : 0;
+
+                // Store current stats
+                this.currentStats = {
+                    words,
+                    characters,
+                    charactersNoSpaces,
+                    sentences,
+                    paragraphs,
+                    avgWordsPerSentence,
+                    readingTime,
+                    longestWord,
+                    avgWordLength,
+                    uniqueWords,
+                    lexicalDiversity,
+                    wordFrequency
                 };
 
-                return ranges[tagName] || 'N/A';
+                // Update UI
+                this.updateDisplay();
             }
 
-            generateSourceCode() {
-                if (!this.currentAnalysis) return;
+            countWords(text) {
+                if (!text.trim()) return 0;
+                return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            }
 
-                let html = '';
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, tag]) => {
-                    if (name === 'title') {
-                        html += `<span class="html-tag">&lt;title&gt;</span>${this.escapeHtml(tag.content)}<span class="html-tag">&lt;/title&gt;</span>\n`;
-                    } else if (name.startsWith('og:') || name.startsWith('twitter:') || name.startsWith('article:')) {
-                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">property</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(tag.content)}"</span><span class="html-tag">&gt;</span>\n`;
-                    } else {
-                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">name</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(tag.content)}"</span><span class="html-tag">&gt;</span>\n`;
+            countSentences(text) {
+                if (!text.trim()) return 0;
+                return text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0).length;
+            }
+
+            countParagraphs(text) {
+                if (!text.trim()) return 0;
+                return text.split(/\n\s*\n/).filter(paragraph => paragraph.trim().length > 0).length;
+            }
+
+            getWordsArray(text) {
+                if (!text.trim()) return [];
+                return text.toLowerCase()
+                          .replace(/[^\w\s]/g, '')
+                          .split(/\s+/)
+                          .filter(word => word.length > 0);
+            }
+
+            calculateReadingTime(words) {
+                const wordsPerMinute = 200;
+                return Math.ceil(words / wordsPerMinute);
+            }
+
+            findLongestWord(wordArray) {
+                if (wordArray.length === 0) return '-';
+                return wordArray.reduce((longest, current) => 
+                    current.length > longest.length ? current : longest
+                );
+            }
+
+            calculateAverageWordLength(wordArray) {
+                if (wordArray.length === 0) return 0;
+                const totalLength = wordArray.reduce((sum, word) => sum + word.length, 0);
+                return Math.round((totalLength / wordArray.length) * 10) / 10;
+            }
+
+            analyzeWordFrequency(wordArray) {
+                const frequency = {};
+                const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'shall', 'it', 'he', 'she', 'they', 'we', 'you', 'i', 'me', 'him', 'her', 'them', 'us', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'this', 'that', 'these', 'those']);
+
+                wordArray.forEach(word => {
+                    if (word.length > 2 && !commonWords.has(word)) {
+                        frequency[word] = (frequency[word] || 0) + 1;
                     }
                 });
 
-                document.getElementById('sourceCode').innerHTML = html;
+                return frequency;
             }
 
-            showLoading() {
-                document.getElementById('loading').classList.add('show');
-                document.getElementById('analysisResults').classList.remove('show');
+            updateDisplay() {
+                const stats = this.currentStats;
+
+                // Update live counter
+                document.getElementById('liveCounter').textContent = 
+                    `${stats.words} words, ${stats.characters} characters`;
+
+                // Update main stats
+                document.getElementById('wordCount').textContent = stats.words.toLocaleString();
+                document.getElementById('charCount').textContent = stats.characters.toLocaleString();
+                document.getElementById('charCountNoSpaces').textContent = stats.charactersNoSpaces.toLocaleString();
+                document.getElementById('sentenceCount').textContent = stats.sentences.toLocaleString();
+                document.getElementById('paragraphCount').textContent = stats.paragraphs.toLocaleString();
+                document.getElementById('avgWordsPerSentence').textContent = stats.avgWordsPerSentence;
+
+                // Update reading time
+                document.getElementById('readingTime').textContent = 
+                    stats.readingTime === 1 ? '1 min' : `${stats.readingTime} min`;
+
+                // Update detailed stats
+                document.getElementById('longestWord').textContent = stats.longestWord;
+                document.getElementById('avgWordLength').textContent = `${stats.avgWordLength} chars`;
+                document.getElementById('uniqueWords').textContent = stats.uniqueWords.toLocaleString();
+                document.getElementById('lexicalDiversity').textContent = `${stats.lexicalDiversity}%`;
+
+                // Update most common word
+                const sortedWords = Object.entries(stats.wordFrequency)
+                    .sort(([,a], [,b]) => b - a);
+                const mostCommon = sortedWords.length > 0 ? 
+                    `${sortedWords[0][0]} (${sortedWords[0][1]}x)` : '-';
+                document.getElementById('mostCommonWord').textContent = mostCommon;
+
+                // Update word frequency list
+                this.updateWordFrequencyList(sortedWords);
             }
 
-            hideLoading() {
-                document.getElementById('loading').classList.remove('show');
+            updateWordFrequencyList(sortedWords) {
+                const container = document.getElementById('wordFrequencyList');
+                
+                if (sortedWords.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">Enter text to see word frequency analysis</div>';
+                    return;
+                }
+
+                const top10 = sortedWords.slice(0, 10);
+                container.innerHTML = top10.map(([word, count]) => `
+                    <div class="word-item">
+                        <span class="word-text">${this.escapeHtml(word)}</span>
+                        <span class="word-count">${count}</span>
+                    </div>
+                `).join('');
             }
 
-            clearResults() {
-                document.getElementById('urlInput').value = '';
-                document.getElementById('analysisResults').classList.remove('show');
-                this.currentAnalysis = null;
-                this.showNotification('Results cleared successfully!');
+            copyResults() {
+                const stats = this.currentStats;
+                
+                let results = 'TEXT ANALYSIS RESULTS\n';
+                results += '===================\n\n';
+                results += `Words: ${stats.words}\n`;
+                results += `Characters: ${stats.characters}\n`;
+                results += `Characters (no spaces): ${stats.charactersNoSpaces}\n`;
+                results += `Sentences: ${stats.sentences}\n`;
+                results += `Paragraphs: ${stats.paragraphs}\n`;
+                results += `Average words per sentence: ${stats.avgWordsPerSentence}\n`;
+                results += `Reading time: ${stats.readingTime} minute(s)\n`;
+                results += `Longest word: ${stats.longestWord}\n`;
+                results += `Average word length: ${stats.avgWordLength} characters\n`;
+                results += `Unique words: ${stats.uniqueWords}\n`;
+                results += `Lexical diversity: ${stats.lexicalDiversity}%\n\n`;
+
+                const sortedWords = Object.entries(stats.wordFrequency)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 10);
+
+                if (sortedWords.length > 0) {
+                    results += 'TOP 10 MOST FREQUENT WORDS:\n';
+                    results += '===========================\n';
+                    sortedWords.forEach(([word, count], index) => {
+                        results += `${index + 1}. ${word}: ${count}\n`;
+                    });
+                }
+
+                this.copyToClipboard(results);
+                this.showNotification('Results copied to clipboard!');
             }
 
-            async copySourceCode() {
-                const sourceCode = document.getElementById('sourceCode').textContent;
+            clearText() {
+                this.textInput.value = '';
+                this.updateStats();
+                this.textInput.focus();
+                this.showNotification('Text cleared!');
+            }
+
+            exportResults(format) {
+                const stats = this.currentStats;
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+
+                switch (format) {
+                    case 'txt':
+                        this.exportAsTxt(stats, timestamp);
+                        break;
+                    case 'csv':
+                        this.exportAsCsv(stats, timestamp);
+                        break;
+                    case 'json':
+                        this.exportAsJson(stats, timestamp);
+                        break;
+                }
+            }
+
+            exportAsTxt(stats, timestamp) {
+                let content = 'TEXT ANALYSIS REPORT\n';
+                content += '==================\n\n';
+                content += `Analysis Date: ${new Date().toLocaleString()}\n\n`;
+                content += 'BASIC STATISTICS:\n';
+                content += `-----------------\n`;
+                content += `Words: ${stats.words}\n`;
+                content += `Characters: ${stats.characters}\n`;
+                content += `Characters (no spaces): ${stats.charactersNoSpaces}\n`;
+                content += `Sentences: ${stats.sentences}\n`;
+                content += `Paragraphs: ${stats.paragraphs}\n\n`;
+                content += 'ADVANCED ANALYSIS:\n';
+                content += '------------------\n';
+                content += `Average words per sentence: ${stats.avgWordsPerSentence}\n`;
+                content += `Reading time: ${stats.readingTime} minute(s)\n`;
+                content += `Longest word: ${stats.longestWord}\n`;
+                content += `Average word length: ${stats.avgWordLength} characters\n`;
+                content += `Unique words: ${stats.uniqueWords}\n`;
+                content += `Lexical diversity: ${stats.lexicalDiversity}%\n\n`;
+
+                const sortedWords = Object.entries(stats.wordFrequency)
+                    .sort(([,a], [,b]) => b - a);
+
+                if (sortedWords.length > 0) {
+                    content += 'WORD FREQUENCY ANALYSIS:\n';
+                    content += '------------------------\n';
+                    sortedWords.forEach(([word, count]) => {
+                        content += `${word}: ${count}\n`;
+                    });
+                }
+
+                this.downloadFile(content, `word-analysis-${timestamp}.txt`, 'text/plain');
+                this.showNotification('TXT file downloaded!');
+            }
+
+            exportAsCsv(stats, timestamp) {
+                let csv = 'Metric,Value\n';
+                csv += `Words,${stats.words}\n`;
+                csv += `Characters,${stats.characters}\n`;
+                csv += `Characters (no spaces),${stats.charactersNoSpaces}\n`;
+                csv += `Sentences,${stats.sentences}\n`;
+                csv += `Paragraphs,${stats.paragraphs}\n`;
+                csv += `Average words per sentence,${stats.avgWordsPerSentence}\n`;
+                csv += `Reading time (minutes),${stats.readingTime}\n`;
+                csv += `Longest word,${stats.longestWord}\n`;
+                csv += `Average word length,${stats.avgWordLength}\n`;
+                csv += `Unique words,${stats.uniqueWords}\n`;
+                csv += `Lexical diversity (%),${stats.lexicalDiversity}\n\n`;
+
+                csv += 'Word,Frequency\n';
+                const sortedWords = Object.entries(stats.wordFrequency)
+                    .sort(([,a], [,b]) => b - a);
+                sortedWords.forEach(([word, count]) => {
+                    csv += `"${word}",${count}\n`;
+                });
+
+                this.downloadFile(csv, `word-analysis-${timestamp}.csv`, 'text/csv');
+                this.showNotification('CSV file downloaded!');
+            }
+
+            exportAsJson(stats, timestamp) {
+                const exportData = {
+                    analysis_date: new Date().toISOString(),
+                    text_statistics: {
+                        words: stats.words,
+                        characters: stats.characters,
+                        characters_no_spaces: stats.charactersNoSpaces,
+                        sentences: stats.sentences,
+                        paragraphs: stats.paragraphs,
+                        average_words_per_sentence: stats.avgWordsPerSentence,
+                        reading_time_minutes: stats.readingTime,
+                        longest_word: stats.longestWord,
+                        average_word_length: stats.avgWordLength,
+                        unique_words: stats.uniqueWords,
+                        lexical_diversity_percent: stats.lexicalDiversity
+                    },
+                    word_frequency: stats.wordFrequency
+                };
+
+                const json = JSON.stringify(exportData, null, 2);
+                this.downloadFile(json, `word-analysis-${timestamp}.json`, 'application/json');
+                this.showNotification('JSON file downloaded!');
+            }
+
+            async copyToClipboard(text) {
                 try {
-                    await navigator.clipboard.writeText(sourceCode);
-                    this.showNotification('Source code copied to clipboard!');
+                    await navigator.clipboard.writeText(text);
                 } catch (err) {
-                    this.showNotification('Failed to copy source code', 'error');
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
                 }
-            }
-
-            downloadSourceCode() {
-                if (!this.currentAnalysis) return;
-
-                const sourceCode = document.getElementById('sourceCode').textContent;
-                this.downloadFile(sourceCode, 'meta-tags-source.html', 'text/html');
-                this.showNotification('Source code downloaded!');
-            }
-
-            exportFullReport() {
-                if (!this.currentAnalysis) return;
-
-                let report = `Meta Tag Analysis Report\n`;
-                report += `========================\n\n`;
-                report += `URL: ${this.currentAnalysis.url}\n`;
-                report += `Title: ${this.currentAnalysis.title}\n`;
-                report += `SEO Score: ${this.currentAnalysis.score}/100\n`;
-                report += `Analysis Date: ${new Date().toLocaleDateString()}\n\n`;
-
-                report += `Meta Tag Details:\n`;
-                report += `=================\n\n`;
-
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, tag]) => {
-                    report += `${name.toUpperCase()}\n`;
-                    report += `Status: ${tag.status.toUpperCase()}\n`;
-                    report += `Content: ${tag.content || 'Not provided'}\n`;
-                    report += `Length: ${tag.length} characters\n`;
-                    if (tag.recommendations && tag.recommendations.length > 0) {
-                        report += `Recommendations:\n`;
-                        tag.recommendations.forEach(rec => {
-                            report += `  - ${rec}\n`;
-                        });
-                    }
-                    report += `\n`;
-                });
-
-                this.downloadFile(report, 'meta-tag-analysis-report.txt', 'text/plain');
-                this.showNotification('Full report exported successfully!');
-            }
-
-            exportJsonData() {
-                if (!this.currentAnalysis) return;
-
-                const jsonData = {
-                    ...this.currentAnalysis,
-                    analysisDate: new Date().toISOString(),
-                    tool: 'Meta Tag Analyzer'
-                };
-
-                const json = JSON.stringify(jsonData, null, 2);
-                this.downloadFile(json, 'meta-tag-analysis.json', 'application/json');
-                this.showNotification('JSON data exported successfully!');
-            }
-
-            exportCsvData() {
-                if (!this.currentAnalysis) return;
-
-                let csv = 'Meta Tag,Content,Length,Status,Recommendations\n';
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, tag]) => {
-                    const recommendations = tag.recommendations ? tag.recommendations.join('; ') : '';
-                    csv += `"${name}","${tag.content || ''}",${tag.length},"${tag.status}","${recommendations}"\n`;
-                });
-
-                this.downloadFile(csv, 'meta-tag-analysis.csv', 'text/csv');
-                this.showNotification('CSV data exported successfully!');
             }
 
             downloadFile(content, filename, mimeType) {
@@ -1444,7 +1007,6 @@
             }
 
             escapeHtml(text) {
-                if (!text) return '';
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
@@ -1458,13 +1020,14 @@
 
                 setTimeout(() => {
                     notification.classList.remove('show');
-                }, 4000);
+                }, 3000);
             }
         }
 
-        // Initialize the meta tag analyzer
+        // Initialize the word counter
+        let wordCounter;
         document.addEventListener('DOMContentLoaded', () => {
-            new MetaTagAnalyzer();
+            wordCounter = new WordCounter();
         });
     </script>
 </body>
