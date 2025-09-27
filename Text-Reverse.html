@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Reverse Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reverse-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .options-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .options-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reverse-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .mode-option {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .mode-option:hover {
+            border-color: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .mode-option.active {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .mode-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .mode-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #1976d2;
+        }
+
+        .mode-option.active .mode-title {
+            color: white;
+        }
+
+        .mode-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .mode-option.active .mode-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mode-example {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .mode-option.active .mode-example {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 250px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.5;
+        }
+
+        .text-area::placeholder {
+            color: #999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .analysis-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .analysis-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .analysis-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .analysis-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .comparison-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .comparison-item {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .comparison-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .comparison-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e3f2fd;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            color: #333;
+            word-break: break-all;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .success-message, .error-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .reverse-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .reverse-modes {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .reverse-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .text-area {
+                min-height: 200px;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-option {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reverse-container">
+        <div class="header">
+            <h1>🔄 Text Reverse Tool</h1>
+            <p>Reverse your text in multiple creative ways</p>
+        </div>
+
+        <div class="options-section">
+            <div class="options-title">
+                ⚙️ Reversal Modes
+            </div>
+            <div class="reverse-modes">
+                <div class="mode-option active" onclick="selectMode('entire')" data-mode="entire">
+                    <span class="mode-icon">🔤</span>
+                    <div class="mode-title">Entire Text</div>
+                    <div class="mode-description">Reverse the complete text character by character</div>
+                    <div class="mode-example">Hello World → dlroW olleH</div>
+                </div>
+
+                <div class="mode-option" onclick="selectMode('words')" data-mode="words">
+                    <span class="mode-icon">📝</span>
+                    <div class="mode-title">Each Word</div>
+                    <div class="mode-description">Reverse each word individually while maintaining word order</div>
+                    <div class="mode-example">Hello World → olleH dlroW</div>
+                </div>
+
+                <div class="mode-option" onclick="selectMode('lines')" data-mode="lines">
+                    <span class="mode-icon">📄</span>
+                    <div class="mode-title">Each Line</div>
+                    <div class="mode-description">Reverse each line individually while maintaining line order</div>
+                    <div class="mode-example">Line 1<br>Line 2 → 1 eniL<br>2 eniL</div>
+                </div>
+
+                <div class="mode-option" onclick="selectMode('wordOrder')" data-mode="wordOrder">
+                    <span class="mode-icon">🔀</span>
+                    <div class="mode-title">Word Order</div>
+                    <div class="mode-description">Reverse the order of words while keeping each word intact</div>
+                    <div class="mode-example">Hello World → World Hello</div>
+                </div>
+
+                <div class="mode-option" onclick="selectMode('lineOrder')" data-mode="lineOrder">
+                    <span class="mode-icon">↕️</span>
+                    <div class="mode-title">Line Order</div>
+                    <div class="mode-description">Reverse the order of lines while keeping each line intact</div>
+                    <div class="mode-example">Line 1<br>Line 2 → Line 2<br>Line 1</div>
+                </div>
+
+                <div class="mode-option" onclick="selectMode('sentences')" data-mode="sentences">
+                    <span class="mode-icon">📖</span>
+                    <div class="mode-title">Each Sentence</div>
+                    <div class="mode-description">Reverse each sentence individually</div>
+                    <div class="mode-example">Hello. World! → .olleH !dlroW</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    ✏️ Input Text
+                </div>
+                <textarea 
+                    class="text-area" 
+                    id="inputText" 
+                    placeholder="Type or paste your text here to reverse it..."
+                    oninput="updateInputStats()"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputChars">0 characters</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📝</span>
+                        <span id="inputWords">0 words</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputLines">0 lines</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    📤 Reversed Text
+                </div>
+                <div class="output-area">
+                    <textarea 
+                        class="text-area" 
+                        id="outputText" 
+                        placeholder="Reversed text will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputChars">0 characters</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🔄</span>
+                        <span id="currentMode">Entire Text</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-primary" id="reverseBtn" onclick="reverseText()">
+                🔄 Reverse Text
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-success" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="analysis-section" id="analysisSection" style="display: none;">
+            <div class="analysis-title">
+                📊 Reversal Analysis
+            </div>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-value" id="originalLength">0</div>
+                    <div class="analysis-label">Original Length</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="reversedLength">0</div>
+                    <div class="analysis-label">Reversed Length</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="wordCount">0</div>
+                    <div class="analysis-label">Words Processed</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="lineCount">0</div>
+                    <div class="analysis-label">Lines Processed</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="sentenceCount">0</div>
+                    <div class="analysis-label">Sentences</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section" id="comparisonSection" style="display: none;">
+            <div class="comparison-title">🔍 Before & After Comparison</div>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <div class="comparison-label">Original Text</div>
+                    <div class="comparison-text" id="originalPreview"></div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Reversed Text</div>
+                    <div class="comparison-text" id="reversedPreview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">⚡ Key Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text">6 different reversal modes</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Instant real-time processing</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed text analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">Fully mobile responsive</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">Text reversed successfully!</div>
+        <div class="error-message" id="errorMessage">Please enter some text to reverse.</div>
+    </div>
+
+    <script>
+        let currentMode = 'entire';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            
+            // Add entrance animation
+            document.querySelector('.reverse-container').style.opacity = '0';
+            document.querySelector('.reverse-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.reverse-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.reverse-container').style.opacity = '1';
+                document.querySelector('.reverse-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputText').focus();
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            reverseText();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            copyOutput();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                        case '1':
+                            e.preventDefault();
+                            selectModeByKey('entire');
+                            break;
+                        case '2':
+                            e.preventDefault();
+                            selectModeByKey('words');
+                            break;
+                        case '3':
+                            e.preventDefault();
+                            selectModeByKey('lines');
+                            break;
+                        case '4':
+                            e.preventDefault();
+                            selectModeByKey('wordOrder');
+                            break;
+                        case '5':
+                            e.preventDefault();
+                            selectModeByKey('lineOrder');
+                            break;
+                        case '6':
+                            e.preventDefault();
+                            selectModeByKey('sentences');
+                            break;
+                    }
+                }
+            });
+        });
+
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Update active mode
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update current mode display
+            const modeNames = {
+                'entire': 'Entire Text',
+                'words': 'Each Word',
+                'lines': 'Each Line',
+                'wordOrder': 'Word Order',
+                'lineOrder': 'Line Order',
+                'sentences': 'Each Sentence'
+            };
+            document.getElementById('currentMode').textContent = modeNames[mode];
+
+            // Auto-reverse if there's content
+            const inputText = document.getElementById('inputText').value.trim();
+            if (inputText) {
+                reverseText();
+            }
+        }
+
+        function selectModeByKey(mode) {
+            const modeElement = document.querySelector(`[data-mode="${mode}"]`);
+            if (modeElement) {
+                modeElement.click();
+            }
+        }
+
+        function updateInputStats() {
+            const inputText = document.getElementById('inputText').value;
+            const chars = inputText.length;
+            const words = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
+            const lines = inputText ? inputText.split('\n').length : 0;
+
+            document.getElementById('inputChars').textContent = `${chars} character${chars !== 1 ? 's' : ''}`;
+            document.getElementById('inputWords').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+            document.getElementById('inputLines').textContent = `${lines} line${lines !== 1 ? 's' : ''}`;
+
+            // Auto-reverse if there's content and a mode is selected
+            if (inputText.trim()) {
+                reverseText();
+            } else {
+                document.getElementById('outputText').value = '';
+                document.getElementById('analysisSection').style.display = 'none';
+                document.getElementById('comparisonSection').style.display = 'none';
+                updateOutputStats('');
+            }
+        }
+
+        function reverseText() {
+            const inputText = document.getElementById('inputText').value;
+            
+            if (!inputText.trim()) {
+                showError('Please enter some text to reverse.');
+                return;
+            }
+
+            let reversedText = '';
+
+            switch (currentMode) {
+                case 'entire':
+                    reversedText = reverseEntireText(inputText);
+                    break;
+                case 'words':
+                    reversedText = reverseEachWord(inputText);
+                    break;
+                case 'lines':
+                    reversedText = reverseEachLine(inputText);
+                    break;
+                case 'wordOrder':
+                    reversedText = reverseWordOrder(inputText);
+                    break;
+                case 'lineOrder':
+                    reversedText = reverseLineOrder(inputText);
+                    break;
+                case 'sentences':
+                    reversedText = reverseEachSentence(inputText);
+                    break;
+                default:
+                    reversedText = reverseEntireText(inputText);
+            }
+
+            displayResult(inputText, reversedText);
+            showSuccess(`Text reversed using ${document.getElementById('currentMode').textContent} mode!`);
+        }
+
+        function reverseEntireText(text) {
+            return text.split('').reverse().join('');
+        }
+
+        function reverseEachWord(text) {
+            return text.replace(/\b\w+\b/g, function(word) {
+                return word.split('').reverse().join('');
+            });
+        }
+
+        function reverseEachLine(text) {
+            return text.split('\n').map(line => {
+                return line.split('').reverse().join('');
+            }).join('\n');
+        }
+
+        function reverseWordOrder(text) {
+            return text.split('\n').map(line => {
+                return line.split(/(\s+)/).filter(part => part.trim()).reverse().join(' ');
+            }).join('\n');
+        }
+
+        function reverseLineOrder(text) {
+            return text.split('\n').reverse().join('\n');
+        }
+
+        function reverseEachSentence(text) {
+            return text.replace(/[^.!?]*[.!?]/g, function(sentence) {
+                return sentence.split('').reverse().join('');
+            });
+        }
+
+        function displayResult(originalText, reversedText) {
+            document.getElementById('outputText').value = reversedText;
+            updateOutputStats(reversedText);
+            updateAnalysis(originalText, reversedText);
+            updateComparison(originalText, reversedText);
+
+            // Show analysis sections
+            document.getElementById('analysisSection').style.display = 'block';
+            document.getElementById('comparisonSection').style.display = 'block';
+
+            // Enable copy button
+            document.getElementById('copyBtn').classList.remove('btn-disabled');
+        }
+
+        function updateOutputStats(text) {
+            const chars = text.length;
+            document.getElementById('outputChars').textContent = `${chars} character${chars !== 1 ? 's' : ''}`;
+        }
+
+        function updateAnalysis(originalText, reversedText) {
+            const originalLength = originalText.length;
+            const reversedLength = reversedText.length;
+            const wordCount = originalText.trim() ? originalText.trim().split(/\s+/).length : 0;
+            const lineCount = originalText ? originalText.split('\n').length : 0;
+            const sentenceCount = originalText.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+
+            document.getElementById('originalLength').textContent = originalLength;
+            document.getElementById('reversedLength').textContent = reversedLength;
+            document.getElementById('wordCount').textContent = wordCount;
+            document.getElementById('lineCount').textContent = lineCount;
+            document.getElementById('sentenceCount').textContent = sentenceCount;
+        }
+
+        function updateComparison(originalText, reversedText) {
+            const maxLength = 200; // Limit preview length
+            
+            const originalPreview = originalText.length > maxLength 
+                ? originalText.substring(0, maxLength) + '...' 
+                : originalText;
+            
+            const reversedPreview = reversedText.length > maxLength 
+                ? reversedText.substring(0, maxLength) + '...' 
+                : reversedText;
+
+            document.getElementById('originalPreview').textContent = originalPreview;
+            document.getElementById('reversedPreview').textContent = reversedPreview;
+        }
+
+        async function copyOutput() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (!outputText.trim()) {
+                showError('No output to copy. Please reverse some text first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Reversed text copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showSuccess('Reversed text copied to clipboard!');
+                } catch (fallbackErr) {
+                    showError('Failed to copy. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('analysisSection').style.display = 'none';
+            document.getElementById('comparisonSection').style.display = 'none';
+            
+            updateInputStats();
+            updateOutputStats('');
+            
+            showSuccess('All text cleared!');
+            document.getElementById('inputText').focus();
+        }
+
+        function loadSample() {
+            const sampleTexts = {
+                'entire': 'Hello World! This is a sample text for the entire text reversal mode. It will reverse every character.',
+                'words': 'Hello World! Each word will be reversed individually while maintaining the original word order.',
+                'lines': 'First line of text\nSecond line of text\nThird line of text\nEach line will be reversed individually.',
+                'wordOrder': 'The quick brown fox jumps over the lazy dog. Word order will be reversed.',
+                'lineOrder': 'Line number one\nLine number two\nLine number three\nLine number four\nLines will be reordered.',
+                'sentences': 'First sentence. Second sentence! Third sentence? Each sentence will be reversed individually.'
+            };
+
+            const sampleText = sampleTexts[currentMode] || sampleTexts['entire'];
+            document.getElementById('inputText').value = sampleText;
+            updateInputStats();
+            showSuccess('Sample text loaded!');
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
