@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter & Validator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .json-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1400px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .options-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .options-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .option-item:hover {
+            border-color: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1976d2;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .option-checkbox.checked {
+            background: #1976d2;
+        }
+
+        .option-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .option-label {
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .indent-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .indent-selector label {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .indent-selector select {
+            border: 1px solid #e3f2fd;
+            border-radius: 6px;
+            padding: 4px 8px;
+            background: white;
+            color: #333;
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-area {
+            width: 100%;
+            min-height: 350px;
+            border: none;
+            outline: none;
+            font-size: 0.9em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            line-height: 1.4;
+            tab-size: 2;
+        }
+
+        .code-area::placeholder {
+            color: #999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .json-display {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #333;
+        }
+
+        .json-key {
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .json-string {
+            color: #4caf50;
+        }
+
+        .json-number {
+            color: #ff9800;
+        }
+
+        .json-boolean {
+            color: #9c27b0;
+        }
+
+        .json-null {
+            color: #f44336;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .validation-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-valid {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .status-invalid {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffcc02;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-format {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-format:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-validate {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-validate:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .error-section {
+            background: #ffebee;
+            border: 2px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .error-title {
+            color: #c62828;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffcdd2;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .stats-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .success-message, .error-alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-alert {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .json-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .options-grid {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-stats {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .json-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .code-area {
+                min-height: 250px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .option-item, .indent-selector {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="json-container">
+        <div class="header">
+            <h1>📋 JSON Formatter & Validator</h1>
+            <p>Format, validate, and beautify your JSON data with syntax highlighting</p>
+        </div>
+
+        <div class="options-section">
+            <div class="options-title">
+                ⚙️ Formatting Options
+            </div>
+            <div class="options-grid">
+                <div class="option-item" onclick="toggleOption('sortKeys')">
+                    <div class="option-checkbox" id="sortKeys"></div>
+                    <label class="option-label">Sort Keys</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('compactArrays')">
+                    <div class="option-checkbox" id="compactArrays"></div>
+                    <label class="option-label">Compact Arrays</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('escapeHtml')">
+                    <div class="option-checkbox" id="escapeHtml"></div>
+                    <label class="option-label">Escape HTML</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('syntaxHighlight')">
+                    <div class="option-checkbox checked" id="syntaxHighlight"></div>
+                    <label class="option-label">Syntax Highlighting</label>
+                </div>
+                <div class="indent-selector">
+                    <label for="indentSize">Indent:</label>
+                    <select id="indentSize" onchange="updateIndentSize()">
+                        <option value="2" selected>2 spaces</option>
+                        <option value="4">4 spaces</option>
+                        <option value="tab">Tab</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    📝 Raw JSON Input
+                </div>
+                <textarea 
+                    class="code-area" 
+                    id="inputJSON" 
+                    placeholder='Paste your JSON here... e.g., {"name": "John", "age": 30}'
+                    oninput="updateInputStats(); validateJSON();"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputLines">0 lines</span>
+                    </div>
+                    <div class="validation-status status-pending" id="validationStatus">
+                        ⏳ Ready to validate
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    ✨ Formatted JSON Output
+                </div>
+                <div class="output-area">
+                    <div class="json-display" id="outputJSON">Formatted JSON will appear here...</div>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📈</span>
+                        <span id="compressionRatio">0% change</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-section" id="errorSection">
+            <div class="error-title">
+                ❌ JSON Validation Error
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-format" onclick="formatJSON()">
+                ✨ Format JSON
+            </button>
+            <button class="action-btn btn-validate" onclick="validateJSON()">
+                ✅ Validate Only
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-secondary" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <div class="stats-title">
+                📊 JSON Analysis
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="objectCount">0</div>
+                    <div class="stat-label">Objects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="arrayCount">0</div>
+                    <div class="stat-label">Arrays</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="keyCount">0</div>
+                    <div class="stat-label">Keys</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="valueCount">0</div>
+                    <div class="stat-label">Values</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="maxDepth">0</div>
+                    <div class="stat-label">Max Depth</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">🔧 Formatter Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text">Real-time JSON validation</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-text">Syntax highlighting support</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed JSON structure analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-text">Customizable formatting options</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">JSON processed successfully!</div>
+        <div class="error-alert" id="errorAlert">Please enter some JSON to process.</div>
+    </div>
+
+    <script>
+        let options = {
+            sortKeys: false,
+            compactArrays: false,
+            escapeHtml: false,
+            syntaxHighlight: true,
+            indentSize: 2
+        };
+
+        let lastValidJSON = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            
+            // Add entrance animation
+            document.querySelector('.json-container').style.opacity = '0';
+            document.querySelector('.json-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.json-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.json-container').style.opacity = '1';
+                document.querySelector('.json-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputJSON').focus();
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            formatJSON();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            copyOutput();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+            });
+        });
+
+        function toggleOption(optionName) {
+            options[optionName] = !options[optionName];
+            const checkbox = document.getElementById(optionName);
+            
+            if (options[optionName]) {
+                checkbox.classList.add('checked');
+            } else {
+                checkbox.classList.remove('checked');
+            }
+
+            // Auto-format if there's valid JSON
+            if (lastValidJSON !== null) {
+                setTimeout(() => displayFormattedJSON(lastValidJSON), 100);
+            }
+        }
+
+        function updateIndentSize() {
+            const indentValue = document.getElementById('indentSize').value;
+            options.indentSize = indentValue === 'tab' ? '\t' : parseInt(indentValue);
+
+            // Auto-format if there's valid JSON
+            if (lastValidJSON !== null) {
+                setTimeout(() => displayFormattedJSON(lastValidJSON), 100);
+            }
+        }
+
+        function updateInputStats() {
+            const inputJSON = document.getElementById('inputJSON').value;
+            const size = new Blob([inputJSON]).size;
+            const lines = inputJSON ? inputJSON.split('\n').length : 0;
+
+            document.getElementById('inputSize').textContent = `${size} bytes`;
+            document.getElementById('inputLines').textContent = `${lines} lines`;
+        }
+
+        function validateJSON() {
+            const inputJSON = document.getElementById('inputJSON').value.trim();
+            const validationStatus = document.getElementById('validationStatus');
+            const errorSection = document.getElementById('errorSection');
+
+            if (!inputJSON) {
+                validationStatus.className = 'validation-status status-pending';
+                validationStatus.innerHTML = '⏳ Ready to validate';
+                errorSection.style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+                return false;
+            }
+
+            try {
+                const parsed = JSON.parse(inputJSON);
+                lastValidJSON = parsed;
+                
+                validationStatus.className = 'validation-status status-valid';
+                validationStatus.innerHTML = '✅ Valid JSON';
+                errorSection.style.display = 'none';
+                
+                analyzeJSON(parsed);
+                return true;
+            } catch (error) {
+                lastValidJSON = null;
+                validationStatus.className = 'validation-status status-invalid';
+                validationStatus.innerHTML = '❌ Invalid JSON';
+                
+                document.getElementById('errorMessage').textContent = error.message;
+                errorSection.style.display = 'block';
+                document.getElementById('statsSection').style.display = 'none';
+                
+                return false;
+            }
+        }
+
+        function formatJSON() {
+            const inputJSON = document.getElementById('inputJSON').value.trim();
+            
+            if (!inputJSON) {
+                showError('Please enter some JSON to format.');
+                return;
+            }
+
+            if (!validateJSON()) {
+                showError('Cannot format invalid JSON. Please fix the errors first.');
+                return;
+            }
+
+            displayFormattedJSON(lastValidJSON);
+            showSuccess('JSON formatted successfully!');
+        }
+
+        function displayFormattedJSON(jsonObj) {
+            try {
+                let formatted;
+                
+                // Sort keys if option is enabled
+                if (options.sortKeys) {
+                    jsonObj = sortObjectKeys(jsonObj);
+                }
+
+                // Format with specified indentation
+                const indent = options.indentSize;
+                formatted = JSON.stringify(jsonObj, null, indent);
+
+                // Apply syntax highlighting if enabled
+                if (options.syntaxHighlight) {
+                    formatted = applySyntaxHighlighting(formatted);
+                }
+
+                // Escape HTML if enabled
+                if (options.escapeHtml) {
+                    formatted = escapeHtml(formatted);
+                }
+
+                document.getElementById('outputJSON').innerHTML = formatted;
+                
+                // Update output stats
+                const outputSize = new Blob([formatted.replace(/<[^>]*>/g, '')]).size;
+                const inputSize = new Blob([document.getElementById('inputJSON').value]).size;
+                const change = inputSize > 0 ? Math.round(((outputSize - inputSize) / inputSize) * 100) : 0;
+                
+                document.getElementById('outputSize').textContent = `${outputSize} bytes`;
+                document.getElementById('compressionRatio').textContent = 
+                    change > 0 ? `+${change}% larger` : 
+                    change < 0 ? `${Math.abs(change)}% smaller` : 'No change';
+
+                // Enable copy button
+                document.getElementById('copyBtn').classList.remove('btn-disabled');
+
+            } catch (error) {
+                showError('Error formatting JSON: ' + error.message);
+            }
+        }
+
+        function applySyntaxHighlighting(jsonString) {
+            return jsonString
+                .replace(/("(\\u[a-fA-F0-9]{4}|\```math
+^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:')
+                .replace(/:\s*("(\\u[a-fA-F0-9]{4}|\```math
+^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
+                .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+                .replace(/:\s*(true|false)/g, ': <span class="json-boolean">$1</span>')
+                .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>')
+                .replace(/^(\s*"[^"]*":\s*"[^"]*")$/gm, '<span class="json-string">$1</span>');
+        }
+
+        function sortObjectKeys(obj) {
+            if (Array.isArray(obj)) {
+                return obj.map(sortObjectKeys);
+            } else if (obj !== null && typeof obj === 'object') {
+                const sorted = {};
+                Object.keys(obj).sort().forEach(key => {
+                    sorted[key] = sortObjectKeys(obj[key]);
+                });
+                return sorted;
+            }
+            return obj;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function analyzeJSON(jsonObj) {
+            const analysis = {
+                objects: 0,
+                arrays: 0,
+                keys: 0,
+                values: 0,
+                maxDepth: 0
+            };
+
+            function analyze(obj, depth = 0) {
+                analysis.maxDepth = Math.max(analysis.maxDepth, depth);
+
+                if (Array.isArray(obj)) {
+                    analysis.arrays++;
+                    obj.forEach(item => {
+                        analysis.values++;
+                        if (typeof item === 'object' && item !== null) {
+                            analyze(item, depth + 1);
+                        }
+                    });
+                } else if (typeof obj === 'object' && obj !== null) {
+                    analysis.objects++;
+                    Object.keys(obj).forEach(key => {
+                        analysis.keys++;
+                        analysis.values++;
+                        if (typeof obj[key] === 'object' && obj[key] !== null) {
+                            analyze(obj[key], depth + 1);
+                        }
+                    });
+                }
+            }
+
+            analyze(jsonObj);
+
+            // Update stats display
+            document.getElementById('objectCount').textContent = analysis.objects;
+            document.getElementById('arrayCount').textContent = analysis.arrays;
+            document.getElementById('keyCount').textContent = analysis.keys;
+            document.getElementById('valueCount').textContent = analysis.values;
+            document.getElementById('maxDepth').textContent = analysis.maxDepth;
+
+            // Show stats section
+            document.getElementById('statsSection').style.display = 'block';
+        }
+
+        async function copyOutput() {
+            const outputElement = document.getElementById('outputJSON');
+            const outputText = outputElement.textContent || outputElement.innerText;
+            
+            if (!outputText.trim() || outputText === 'Formatted JSON will appear here...') {
+                showError('No output to copy. Please format some JSON first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Formatted JSON copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                showError('Failed to copy. Please select and copy manually.');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputJSON').value = '';
+            document.getElementById('outputJSON').innerHTML = 'Formatted JSON will appear here...';
+            document.getElementById('errorSection').style.display = 'none';
+            document.getElementById('statsSection').style.display = 'none';
+            
+            const validationStatus = document.getElementById('validationStatus');
+            validationStatus.className = 'validation-status status-pending';
+            validationStatus.innerHTML = '⏳ Ready to validate';
+            
+            updateInputStats();
+            document.getElementById('outputSize').textContent = '0 bytes';
+            document.getElementById('compressionRatio').textContent = '0% change';
+            
+            lastValidJSON = null;
+            showSuccess('All content cleared!');
+            document.getElementById('inputJSON').focus();
+        }
+
+        function loadSample() {
+            const sampleJSON = `{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "active": true,
+      "profile": {
+        "age": 30,
+        "location": "New York",
+        "preferences": {
+          "theme": "dark",
+          "notifications": true,
+          "language": "en"
+        }
+      },
+      "roles": ["user", "editor"],
+      "lastLogin": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com", 
+      "active": false,
+      "profile": {
+        "age": 25,
+        "location": "San Francisco",
+        "preferences": {
+          "theme": "light",
+          "notifications": false,
+          "language": "es"
+        }
+      },
+      "roles": ["user"],
+      "lastLogin": null
+    }
+  ],
+  "metadata": {
+    "total": 2,
+    "page": 1,
+    "limit": 10,
+    "generated": "2024-01-20T15:45:30Z"
+  }
+}`;
+
+            document.getElementById('inputJSON').value = sampleJSON;
+            updateInputStats();
+            validateJSON();
+            showSuccess('Sample JSON loaded!');
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorAlert');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
