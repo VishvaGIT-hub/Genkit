@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .regex-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .regex-input-container:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .regex-delimiter {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            color: #007bff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-right: 1px solid #e9ecef;
+        }
+
+        #regexInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+        }
+
+        .flags-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .flag-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .flag-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007bff;
+        }
+
+        .flag-item label {
+            font-size: 0.9rem;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        #testString {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        #testString:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            outline: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .results-header h3 {
+            color: #007bff;
+            font-size: 1.4rem;
+        }
+
+        .match-count {
+            background: #007bff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .match-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #007bff;
+            word-break: break-all;
+        }
+
+        .highlighted-text {
+            font-family: 'Courier New', monospace;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .match-highlight {
+            background: #007bff;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-top: 15px;
+        }
+
+        .error-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .flags-container {
+                justify-content: center;
+            }
+
+            .match-info {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .regex-delimiter {
+                padding: 10px 12px;
+            }
+
+            #regexInput {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Regex Tester</h1>
+            <p>Test your regular expressions with real-time feedback and detailed match analysis</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="regexInput">Regular Expression</label>
+                    <div class="regex-input-container">
+                        <span class="regex-delimiter">/</span>
+                        <input type="text" id="regexInput" placeholder="Enter your regex pattern here..." autocomplete="off">
+                        <span class="regex-delimiter">/</span>
+                    </div>
+                    <div class="flags-container">
+                        <div class="flag-item">
+                            <input type="checkbox" id="globalFlag" checked>
+                            <label for="globalFlag">Global (g)</label>
+                        </div>
+                        <div class="flag-item">
+                            <input type="checkbox" id="caseInsensitiveFlag">
+                            <label for="caseInsensitiveFlag">Case Insensitive (i)</label>
+                        </div>
+                        <div class="flag-item">
+                            <input type="checkbox" id="multilineFlag">
+                            <label for="multilineFlag">Multiline (m)</label>
+                        </div>
+                        <div class="flag-item">
+                            <input type="checkbox" id="dotAllFlag">
+                            <label for="dotAllFlag">Dot All (s)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="testString">Test String</label>
+                    <textarea id="testString" placeholder="Enter your test string here..."></textarea>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" id="testBtn">
+                    <span>🔍</span> Test Regex
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <span>🗑️</span> Clear All
+                </button>
+                <button class="btn btn-success" id="copyBtn">
+                    <span>📋</span> Copy Results
+                </button>
+            </div>
+
+            <div id="results" class="results-section" style="display: none;">
+                <div class="results-header">
+                    <h3>Results</h3>
+                    <span id="matchCount" class="match-count">0 matches</span>
+                </div>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="copyNotification" class="copy-notification">
+        Results copied to clipboard!
+    </div>
+
+    <script>
+        class RegexTester {
+            constructor() {
+                this.regexInput = document.getElementById('regexInput');
+                this.testString = document.getElementById('testString');
+                this.globalFlag = document.getElementById('globalFlag');
+                this.caseInsensitiveFlag = document.getElementById('caseInsensitiveFlag');
+                this.multilineFlag = document.getElementById('multilineFlag');
+                this.dotAllFlag = document.getElementById('dotAllFlag');
+                this.testBtn = document.getElementById('testBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+                this.results = document.getElementById('results');
+                this.resultsContent = document.getElementById('resultsContent');
+                this.matchCount = document.getElementById('matchCount');
+                this.copyNotification = document.getElementById('copyNotification');
+
+                this.initEventListeners();
+                this.loadFromLocalStorage();
+            }
+
+            initEventListeners() {
+                // Real-time testing
+                this.regexInput.addEventListener('input', () => this.testRegex());
+                this.testString.addEventListener('input', () => this.testRegex());
+                
+                // Flag changes
+                [this.globalFlag, this.caseInsensitiveFlag, this.multilineFlag, this.dotAllFlag]
+                    .forEach(flag => flag.addEventListener('change', () => this.testRegex()));
+
+                // Button events
+                this.testBtn.addEventListener('click', () => this.testRegex());
+                this.clearBtn.addEventListener('click', () => this.clearAll());
+                this.copyBtn.addEventListener('click', () => this.copyResults());
+
+                // Save to localStorage on input
+                this.regexInput.addEventListener('input', () => this.saveToLocalStorage());
+                this.testString.addEventListener('input', () => this.saveToLocalStorage());
+            }
+
+            getFlags() {
+                let flags = '';
+                if (this.globalFlag.checked) flags += 'g';
+                if (this.caseInsensitiveFlag.checked) flags += 'i';
+                if (this.multilineFlag.checked) flags += 'm';
+                if (this.dotAllFlag.checked) flags += 's';
+                return flags;
+            }
+
+            testRegex() {
+                const pattern = this.regexInput.value.trim();
+                const text = this.testString.value;
+                const flags = this.getFlags();
+
+                if (!pattern) {
+                    this.hideResults();
+                    return;
+                }
+
+                try {
+                    const regex = new RegExp(pattern, flags);
+                    const matches = [...text.matchAll(regex)];
+                    this.displayResults(matches, text, regex);
+                } catch (error) {
+                    this.displayError(error.message);
+                }
+            }
+
+            displayResults(matches, text, regex) {
+                this.showResults();
+                
+                if (matches.length === 0) {
+                    this.matchCount.textContent = '0 matches';
+                    this.resultsContent.innerHTML = '<div class="no-results">No matches found</div>';
+                    return;
+                }
+
+                this.matchCount.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'}`;
+
+                let html = '';
+                matches.forEach((match, index) => {
+                    html += this.createMatchElement(match, index);
+                });
+
+                html += this.createHighlightedText(text, matches);
+                this.resultsContent.innerHTML = html;
+            }
+
+            createMatchElement(match, index) {
+                const groups = match.slice(1);
+                const hasGroups = groups.some(group => group !== undefined);
+
+                let html = `
+                    <div class="result-item">
+                        <div class="match-info">
+                            <div class="info-item">
+                                <span class="info-label">Match ${index + 1}</span>
+                                <span class="info-value">${this.escapeHtml(match[0])}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Position</span>
+                                <span class="info-value">${match.index} - ${match.index + match[0].length - 1}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Length</span>
+                                <span class="info-value">${match[0].length}</span>
+                            </div>
+                        </div>
+                `;
+
+                if (hasGroups) {
+                    html += '<div class="match-info">';
+                    groups.forEach((group, groupIndex) => {
+                        html += `
+                            <div class="info-item">
+                                <span class="info-label">Group ${groupIndex + 1}</span>
+                                <span class="info-value">${group !== undefined ? this.escapeHtml(group) : 'undefined'}</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            createHighlightedText(text, matches) {
+                if (matches.length === 0) return '';
+
+                let highlightedText = text;
+                let offset = 0;
+
+                // Sort matches by position to handle overlapping matches correctly
+                const sortedMatches = [...matches].sort((a, b) => a.index - b.index);
+
+                sortedMatches.forEach(match => {
+                    const start = match.index + offset;
+                    const end = start + match[0].length;
+                    const matchText = match[0];
+                    const highlighted = `<span class="match-highlight">${this.escapeHtml(matchText)}</span>`;
+                    
+                    highlightedText = highlightedText.substring(0, start) + 
+                                    highlighted + 
+                                    highlightedText.substring(end);
+                    
+                    offset += highlighted.length - matchText.length;
+                });
+
+                return `
+                    <div class="result-item">
+                        <div class="info-label">Highlighted Text</div>
+                        <div class="highlighted-text">${highlightedText}</div>
+                    </div>
+                `;
+            }
+
+            displayError(errorMessage) {
+                this.showResults();
+                this.matchCount.textContent = 'Error';
+                this.resultsContent.innerHTML = `
+                    <div class="error">
+                        <div class="error-title">Regular Expression Error</div>
+                        <div>${this.escapeHtml(errorMessage)}</div>
+                    </div>
+                `;
+            }
+
+            showResults() {
+                this.results.style.display = 'block';
+            }
+
+            hideResults() {
+                this.results.style.display = 'none';
+            }
+
+            clearAll() {
+                this.regexInput.value = '';
+                this.testString.value = '';
+                this.globalFlag.checked = true;
+                this.caseInsensitiveFlag.checked = false;
+                this.multilineFlag.checked = false;
+                this.dotAllFlag.checked = false;
+                this.hideResults();
+                this.saveToLocalStorage();
+            }
+
+            async copyResults() {
+                const resultsText = this.getResultsAsText();
+                
+                try {
+                    await navigator.clipboard.writeText(resultsText);
+                    this.showCopyNotification();
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = resultsText;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showCopyNotification();
+                }
+            }
+
+            getResultsAsText() {
+                const pattern = this.regexInput.value;
+                const flags = this.getFlags();
+                const text = this.testString.value;
+                const matchCountText = this.matchCount.textContent;
+
+                let result = `Regex Pattern: /${pattern}/${flags}\n`;
+                result += `Test String: ${text}\n`;
+                result += `Results: ${matchCountText}\n\n`;
+
+                if (this.resultsContent.querySelector('.error')) {
+                    const errorText = this.resultsContent.querySelector('.error').textContent;
+                    result += `Error: ${errorText}`;
+                } else if (this.resultsContent.querySelector('.no-results')) {
+                    result += 'No matches found';
+                } else {
+                    const matches = this.resultsContent.querySelectorAll('.result-item');
+                    matches.forEach((match, index) => {
+                        if (match.querySelector('.match-highlight')) return; // Skip highlighted text section
+                        
+                        const infoItems = match.querySelectorAll('.info-item');
+                        result += `Match ${index + 1}:\n`;
+                        infoItems.forEach(item => {
+                            const label = item.querySelector('.info-label').textContent;
+                            const value = item.querySelector('.info-value').textContent;
+                            result += `  ${label}: ${value}\n`;
+                        });
+                        result += '\n';
+                    });
+                }
+
+                return result;
+            }
+
+            showCopyNotification() {
+                this.copyNotification.classList.add('show');
+                setTimeout(() => {
+                    this.copyNotification.classList.remove('show');
+                }, 3000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            saveToLocalStorage() {
+                const data = {
+                    pattern: this.regexInput.value,
+                    testString: this.testString.value,
+                    flags: {
+                        global: this.globalFlag.checked,
+                        caseInsensitive: this.caseInsensitiveFlag.checked,
+                        multiline: this.multilineFlag.checked,
+                        dotAll: this.dotAllFlag.checked
+                    }
+                };
+                localStorage.setItem('regexTesterData', JSON.stringify(data));
+            }
+
+            loadFromLocalStorage() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('regexTesterData'));
+                    if (data) {
+                        this.regexInput.value = data.pattern || '';
+                        this.testString.value = data.testString || '';
+                        if (data.flags) {
+                            this.globalFlag.checked = data.flags.global !== false;
+                            this.caseInsensitiveFlag.checked = data.flags.caseInsensitive || false;
+                            this.multilineFlag.checked = data.flags.multiline || false;
+                            this.dotAllFlag.checked = data.flags.dotAll || false;
+                        }
+                        
+                        // Test regex if both pattern and test string exist
+                        if (data.pattern && data.testString) {
+                            this.testRegex();
+                        }
+                    }
+                } catch (error) {
+                    console.log('No saved data found');
+                }
+            }
+        }
+
+        // Initialize the regex tester when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new RegexTester();
+        });
+    </script>
+</body>
+</html>
