@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Shortener Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shortener-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1100px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .settings-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .settings-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-group {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .setting-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .shortening-level {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .level-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            background: white;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .level-btn.active {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .level-btn:hover:not(.active) {
+            border-color: #1976d2;
+            color: #1976d2;
+        }
+
+        .target-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .target-input:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 8px rgba(25, 118, 210, 0.2);
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 250px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .text-area::placeholder {
+            color: #999;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .analysis-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .analysis-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .analysis-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .analysis-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .progress-title {
+            color: #1976d2;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .processing-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 3px solid #e3f2fd;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message, .error-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .shortener-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .shortener-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .text-area {
+                min-height: 200px;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .level-btn {
+                font-size: 0.8em;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shortener-container">
+        <div class="header">
+            <h1>✂️ Text Shortener</h1>
+            <p>Intelligently shorten your text while preserving meaning</p>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">
+                ⚙️ Shortening Settings
+            </div>
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <div class="setting-label">Shortening Level</div>
+                    <div class="shortening-level">
+                        <div class="level-btn active" onclick="setLevel('light')">Light</div>
+                        <div class="level-btn" onclick="setLevel('medium')">Medium</div>
+                        <div class="level-btn" onclick="setLevel('aggressive')">Heavy</div>
+                    </div>
+                    <small style="color: #666;">Light: 20% reduction | Medium: 40% | Heavy: 60%</small>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">Target Word Count (Optional)</div>
+                    <input type="number" class="target-input" id="targetWords" placeholder="Enter target word count" min="10" max="10000">
+                    <small style="color: #666;">Leave empty to use percentage reduction</small>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">Shortening Method</div>
+                    <select class="target-input" id="shorteningMethod">
+                        <option value="smart">Smart Summarization</option>
+                        <option value="sentences">Key Sentences Only</option>
+                        <option value="keywords">Keyword-Based</option>
+                        <option value="trim">Trim & Compress</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    📝 Input Text
+                </div>
+                <textarea 
+                    class="text-area" 
+                    id="inputText" 
+                    placeholder="Paste or type your long text here to shorten it..."
+                    oninput="updateInputStats()"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputWords">0 words</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputChars">0 characters</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏱️</span>
+                        <span id="readingTime">0 min read</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    📤 Shortened Text
+                </div>
+                <div class="output-area">
+                    <textarea 
+                        class="text-area" 
+                        id="outputText" 
+                        placeholder="Shortened text will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputWords">0 words</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📉</span>
+                        <span id="reduction">0% reduction</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏱️</span>
+                        <span id="newReadingTime">0 min read</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-primary" id="shortenBtn" onclick="shortenText()">
+                ✂️ Shorten Text
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-success" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="processing-indicator" id="processingIndicator">
+            <div class="spinner"></div>
+            Processing and shortening your text...
+        </div>
+
+        <div class="progress-section" id="progressSection" style="display: none;">
+            <div class="progress-title">📊 Text Reduction Progress</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;">0%</div>
+            </div>
+            <div class="progress-labels">
+                <span>Original Length</span>
+                <span>Target Achieved</span>
+            </div>
+        </div>
+
+        <div class="analysis-section" id="analysisSection" style="display: none;">
+            <div class="analysis-title">
+                📈 Shortening Analysis
+            </div>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-value" id="originalWordCount">0</div>
+                    <div class="analysis-label">Original Words</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="shortenedWordCount">0</div>
+                    <div class="analysis-label">Shortened Words</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="wordsRemoved">0</div>
+                    <div class="analysis-label">Words Removed</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="compressionRatio">0%</div>
+                    <div class="analysis-label">Compression</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="timeSaved">0s</div>
+                    <div class="analysis-label">Time Saved</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">🎯 Smart Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-text">AI-powered content analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-text">Preserves key information</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Multiple shortening methods</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed analytics and stats</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">Text shortened successfully!</div>
+        <div class="error-message" id="errorMessage">Please enter some text to shorten.</div>
+    </div>
+
+    <script>
+        let settings = {
+            level: 'light',
+            method: 'smart',
+            targetWords: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            
+            // Add entrance animation
+            document.querySelector('.shortener-container').style.opacity = '0';
+            document.querySelector('.shortener-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.shortener-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.shortener-container').style.opacity = '1';
+                document.querySelector('.shortener-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputText').focus();
+
+            // Add event listeners
+            document.getElementById('targetWords').addEventListener('input', function() {
+                settings.targetWords = this.value ? parseInt(this.value) : null;
+            });
+
+            document.getElementById('shorteningMethod').addEventListener('change', function() {
+                settings.method = this.value;
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            shortenText();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            copyOutput();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+            });
+        });
+
+        function setLevel(level) {
+            settings.level = level;
+            
+            // Update UI
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function updateInputStats() {
+            const inputText = document.getElementById('inputText').value;
+            const words = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
+            const chars = inputText.length;
+            const readingTime = Math.ceil(words / 200);
+
+            document.getElementById('inputWords').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+            document.getElementById('inputChars').textContent = `${chars} character${chars !== 1 ? 's' : ''}`;
+            document.getElementById('readingTime').textContent = `${readingTime} min read`;
+        }
+
+        function shortenText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showError('Please enter some text to shorten.');
+                return;
+            }
+
+            const words = inputText.split(/\s+/).length;
+            if (words < 10) {
+                showError('Please enter at least 10 words for effective shortening.');
+                return;
+            }
+
+            showProcessing();
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    const result = processTextShortening(inputText);
+                    displayResult(result);
+                    hideProcessing();
+                    showSuccess('Text shortened successfully!');
+                } catch (error) {
+                    hideProcessing();
+                    showError('An error occurred while processing the text.');
+                    console.error(error);
+                }
+            }, 100);
+        }
+
+        function processTextShortening(text) {
+            const originalWords = text.trim().split(/\s+/).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            // Determine target word count
+            let targetWords = settings.targetWords;
+            if (!targetWords) {
+                const reductionRates = { light: 0.8, medium: 0.6, aggressive: 0.4 };
+                targetWords = Math.floor(originalWords * reductionRates[settings.level]);
+            }
+            
+            targetWords = Math.max(10, Math.min(targetWords, originalWords));
+
+            let shortenedText = '';
+
+            switch (settings.method) {
+                case 'smart':
+                    shortenedText = smartSummarization(text, targetWords);
+                    break;
+                case 'sentences':
+                    shortenedText = extractKeySentences(sentences, targetWords);
+                    break;
+                case 'keywords':
+                    shortenedText = keywordBasedShortening(text, targetWords);
+                    break;
+                case 'trim':
+                    shortenedText = trimAndCompress(text, targetWords);
+                    break;
+                default:
+                    shortenedText = smartSummarization(text, targetWords);
+            }
+
+            const finalWords = shortenedText.trim().split(/\s+/).length;
+            const reduction = Math.round(((originalWords - finalWords) / originalWords) * 100);
+            const timeSaved = Math.round((originalWords - finalWords) / 200 * 60); // seconds
+
+            return {
+                originalText: text,
+                shortenedText: shortenedText,
+                originalWords: originalWords,
+                finalWords: finalWords,
+                reduction: reduction,
+                timeSaved: timeSaved
+            };
+        }
+
+        function smartSummarization(text, targetWords) {
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const scoredSentences = [];
+
+            // Score sentences based on various factors
+            sentences.forEach((sentence, index) => {
+                const words = sentence.trim().split(/\s+/);
+                let score = 0;
+
+                // Position weight (first and last sentences are often important)
+                if (index === 0 || index === sentences.length - 1) score += 2;
+                if (index < sentences.length * 0.3) score += 1;
+
+                // Length weight (not too short, not too long)
+                if (words.length >= 8 && words.length <= 25) score += 1;
+
+                // Keyword density
+                const keywordCount = countKeywords(sentence);
+                score += keywordCount * 0.5;
+
+                // Avoid very short sentences unless they're impactful
+                if (words.length < 5) score -= 1;
+
+                scoredSentences.push({
+                    sentence: sentence.trim(),
+                    score: score,
+                    wordCount: words.length
+                });
+            });
+
+            // Sort by score and select best sentences
+            scoredSentences.sort((a, b) => b.score - a.score);
+            
+            let result = '';
+            let wordCount = 0;
+            
+            for (const item of scoredSentences) {
+                if (wordCount + item.wordCount <= targetWords) {
+                    result += (result ? '. ' : '') + item.sentence;
+                    wordCount += item.wordCount;
+                } else if (wordCount < targetWords * 0.8) {
+                    // Try to fit a shortened version
+                    const shortened = shortenSentence(item.sentence, targetWords - wordCount);
+                    if (shortened) {
+                        result += (result ? '. ' : '') + shortened;
+                        break;
+                    }
+                }
+            }
+
+            return result + (result && !result.match(/[.!?]$/) ? '.' : '');
+        }
+
+        function extractKeySentences(sentences, targetWords) {
+            const scoredSentences = sentences.map((sentence, index) => {
+                const words = sentence.trim().split(/\s+/);
+                let score = countKeywords(sentence);
+                
+                // Position bonus
+                if (index === 0) score += 2;
+                if (index === sentences.length - 1) score += 1;
+                
+                // Length penalty for very short or very long sentences
+                if (words.length < 5) score -= 2;
+                if (words.length > 30) score -= 1;
+
+                return {
+                    sentence: sentence.trim(),
+                    score: score,
+                    wordCount: words.length,
+                    index: index
+                };
+            });
+
+            scoredSentences.sort((a, b) => b.score - a.score);
+            
+            let result = [];
+            let wordCount = 0;
+            
+            for (const item of scoredSentences) {
+                if (wordCount + item.wordCount <= targetWords) {
+                    result.push(item);
+                    wordCount += item.wordCount;
+                }
+            }
+
+            // Sort by original order
+            result.sort((a, b) => a.index - b.index);
+            
+            return result.map(item => item.sentence).join('. ') + '.';
+        }
+
+        function keywordBasedShortening(text, targetWords) {
+            const words = text.split(/\s+/);
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            // Extract keywords
+            const keywords = extractKeywords(text);
+            const keywordSet = new Set(keywords.map(k => k.toLowerCase()));
+            
+            // Score sentences based on keyword density
+            const scoredSentences = sentences.map((sentence, index) => {
+                const sentenceWords = sentence.toLowerCase().split(/\s+/);
+                const keywordCount = sentenceWords.filter(word => keywordSet.has(word)).length;
+                const density = keywordCount / sentenceWords.length;
+                
+                return {
+                    sentence: sentence.trim(),
+                    density: density,
+                    wordCount: sentence.split(/\s+/).length,
+                    index: index
+                };
+            });
+
+            scoredSentences.sort((a, b) => b.density - a.density);
+            
+            let result = [];
+            let wordCount = 0;
+            
+            for (const item of scoredSentences) {
+                if (wordCount + item.wordCount <= targetWords) {
+                    result.push(item);
+                    wordCount += item.wordCount;
+                }
+            }
+
+            result.sort((a, b) => a.index - b.index);
+            return result.map(item => item.sentence).join('. ') + '.';
+        }
+
+        function trimAndCompress(text, targetWords) {
+            let words = text.split(/\s+/);
+            
+            // Remove common unnecessary words
+            const unnecessaryWords = ['really', 'very', 'quite', 'rather', 'somewhat', 'actually', 'basically', 'literally', 'obviously', 'certainly', 'definitely', 'absolutely', 'completely', 'totally', 'entirely'];
+            
+            words = words.filter(word => !unnecessaryWords.includes(word.toLowerCase()));
+            
+            // If still too long, remove adjectives and adverbs
+            if (words.length > targetWords) {
+                words = words.filter(word => {
+                    const lower = word.toLowerCase();
+                    return !(lower.endsWith('ly') || lower.endsWith('ful') || lower.endsWith('less'));
+                });
+            }
+            
+            // If still too long, take first targetWords
+            if (words.length > targetWords) {
+                words = words.slice(0, targetWords);
+            }
+            
+            return words.join(' ');
+        }
+
+        function countKeywords(text) {
+            const words = text.toLowerCase().split(/\s+/);
+            const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can']);
+            
+            return words.filter(word => word.length > 3 && !stopWords.has(word)).length;
+        }
+
+        function extractKeywords(text) {
+            const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+            const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they']);
+            
+            const filteredWords = words.filter(word => word.length > 3 && !stopWords.has(word));
+            const wordCount = {};
+            
+            filteredWords.forEach(word => {
+                wordCount[word] = (wordCount[word] || 0) + 1;
+            });
+            
+            return Object.entries(wordCount)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10)
+                .map(([word]) => word);
+        }
+
+        function shortenSentence(sentence, maxWords) {
+            const words = sentence.split(/\s+/);
+            if (words.length <= maxWords) return sentence;
+            
+            // Try to keep the essential parts
+            const trimmed = words.slice(0, maxWords);
+            return trimmed.join(' ');
+        }
+
+        function displayResult(result) {
+            document.getElementById('outputText').value = result.shortenedText;
+            
+            // Update output stats
+            const outputReadingTime = Math.ceil(result.finalWords / 200);
+            document.getElementById('outputWords').textContent = `${result.finalWords} words`;
+            document.getElementById('reduction').textContent = `${result.reduction}% reduction`;
+            document.getElementById('newReadingTime').textContent = `${outputReadingTime} min read`;
+
+            // Update analysis
+            document.getElementById('originalWordCount').textContent = result.originalWords;
+            document.getElementById('shortenedWordCount').textContent = result.finalWords;
+            document.getElementById('wordsRemoved').textContent = result.originalWords - result.finalWords;
+            document.getElementById('compressionRatio').textContent = result.reduction + '%';
+            document.getElementById('timeSaved').textContent = result.timeSaved + 's';
+
+            // Update progress bar
+            document.getElementById('progressFill').style.width = result.reduction + '%';
+            document.getElementById('progressFill').textContent = result.reduction + '%';
+
+            // Show sections
+            document.getElementById('analysisSection').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'block';
+
+            // Enable copy button
+            document.getElementById('copyBtn').classList.remove('btn-disabled');
+        }
+
+        function showProcessing() {
+            document.getElementById('processingIndicator').style.display = 'block';
+            document.getElementById('shortenBtn').classList.add('btn-disabled');
+            document.getElementById('shortenBtn').disabled = true;
+        }
+
+        function hideProcessing() {
+            document.getElementById('processingIndicator').style.display = 'none';
+            document.getElementById('shortenBtn').classList.remove('btn-disabled');
+            document.getElementById('shortenBtn').disabled = false;
+        }
+
+        async function copyOutput() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (!outputText.trim()) {
+                showError('No output to copy. Please shorten some text first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Shortened text copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                showError('Failed to copy. Please select and copy manually.');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('analysisSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            
+            updateInputStats();
+            document.getElementById('outputWords').textContent = '0 words';
+            document.getElementById('reduction').textContent = '0% reduction';
+            document.getElementById('newReadingTime').textContent = '0 min read';
+            
+            showSuccess('All text cleared!');
+            document.getElementById('inputText').focus();
+        }
+
+        function loadSample() {
+            const sampleText = `Artificial intelligence and machine learning technologies have revolutionized numerous industries and continue to transform the way we work, communicate, and live our daily lives. These advanced computational systems are capable of processing vast amounts of data, identifying complex patterns, and making sophisticated decisions that were previously thought to be exclusively within the realm of human capability.
+
+The applications of AI and ML span across healthcare, where they assist in diagnostic imaging and drug discovery, to finance, where they enable fraud detection and algorithmic trading. In the automotive industry, these technologies power autonomous vehicles and advanced driver assistance systems. Furthermore, AI has enhanced customer service through chatbots and virtual assistants, while machine learning algorithms optimize supply chain management and predictive maintenance in manufacturing.
+
+Despite these remarkable achievements, the rapid advancement of artificial intelligence also presents significant challenges and ethical considerations. Issues such as job displacement, privacy concerns, algorithmic bias, and the need for transparent and explainable AI systems require careful attention from policymakers, technologists, and society as a whole. As we continue to integrate these powerful technologies into our infrastructure, it becomes increasingly important to ensure that their development and deployment are guided by principles of fairness, accountability, and human welfare.`;
+
+            document.getElementById('inputText').value = sampleText;
+            updateInputStats();
+            showSuccess('Sample text loaded!');
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
