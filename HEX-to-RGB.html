@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEX to RGB Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .converter-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .hex-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .hex-input-container:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .hex-input-container.valid {
+            border-color: #28a745;
+        }
+
+        .hex-input-container.invalid {
+            border-color: #dc3545;
+        }
+
+        .hex-prefix {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            color: #007bff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-right: 1px solid #e9ecef;
+            font-size: 1.1rem;
+        }
+
+        #hexInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .validation-icon {
+            padding: 12px;
+            font-size: 1.2rem;
+        }
+
+        .validation-icon.valid {
+            color: #28a745;
+        }
+
+        .validation-icon.invalid {
+            color: #dc3545;
+        }
+
+        .color-display {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 25px;
+            align-items: center;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .color-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 12px;
+            border: 3px solid #e9ecef;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .color-values {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .value-item:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .value-label {
+            font-weight: 600;
+            color: #007bff;
+            font-size: 1rem;
+            width: 60px;
+        }
+
+        .value-display {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            flex: 1;
+            margin: 0 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #1e7e34;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .rgb-input-section {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .rgb-input-section h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .rgb-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .rgb-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rgb-input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #6c757d;
+        }
+
+        .rgb-input {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .rgb-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+        }
+
+        .history-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .history-section h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .history-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        .history-color {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin: 0 auto 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .history-hex {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .history-rgb {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .converter-section {
+                padding: 20px;
+            }
+
+            .color-display {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .color-preview {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .rgb-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .history-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .converter-section {
+                padding: 15px;
+            }
+
+            .color-display {
+                padding: 20px;
+            }
+
+            .color-preview {
+                width: 100px;
+                height: 100px;
+            }
+
+            .value-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .copy-btn {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 HEX to RGB Converter</h1>
+            <p>Convert HEX color codes to RGB values instantly with live preview</p>
+        </div>
+
+        <div class="main-content">
+            <div class="converter-section">
+                <div class="input-group">
+                    <label for="hexInput">HEX Color Code</label>
+                    <div class="hex-input-container" id="hexContainer">
+                        <span class="hex-prefix">#</span>
+                        <input type="text" id="hexInput" placeholder="Enter HEX code (e.g., FF5733)" maxlength="6" autocomplete="off">
+                        <span class="validation-icon" id="validationIcon"></span>
+                    </div>
+                    <div class="error-message" id="errorMessage">
+                        Please enter a valid HEX color code (3 or 6 characters)
+                    </div>
+                </div>
+
+                <div class="color-display">
+                    <div class="color-preview" id="colorPreview">
+                        Enter a HEX code to see the color
+                    </div>
+                    <div class="color-values">
+                        <div class="value-item">
+                            <span class="value-label">HEX:</span>
+                            <span class="value-display" id="hexOutput">#000000</span>
+                            <button class="copy-btn" onclick="copyToClipboard('hex')">Copy</button>
+                        </div>
+                        <div class="value-item">
+                            <span class="value-label">RGB:</span>
+                            <span class="value-display" id="rgbOutput">rgb(0, 0, 0)</span>
+                            <button class="copy-btn" onclick="copyToClipboard('rgb')">Copy</button>
+                        </div>
+                        <div class="value-item">
+                            <span class="value-label">Values:</span>
+                            <span class="value-display" id="rgbValues">R: 0, G: 0, B: 0</span>
+                            <button class="copy-btn" onclick="copyToClipboard('values')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="convertBtn">
+                        <span>🔄</span> Convert
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> Clear
+                    </button>
+                    <button class="btn btn-success" id="copyAllBtn">
+                        <span>📋</span> Copy All
+                    </button>
+                </div>
+            </div>
+
+            <div class="rgb-input-section">
+                <h3>🔄 RGB to HEX Converter</h3>
+                <div class="rgb-inputs">
+                    <div class="rgb-input-group">
+                        <label for="rInput">Red (0-255)</label>
+                        <input type="number" id="rInput" class="rgb-input" min="0" max="255" placeholder="0">
+                    </div>
+                    <div class="rgb-input-group">
+                        <label for="gInput">Green (0-255)</label>
+                        <input type="number" id="gInput" class="rgb-input" min="0" max="255" placeholder="0">
+                    </div>
+                    <div class="rgb-input-group">
+                        <label for="bInput">Blue (0-255)</label>
+                        <input type="number" id="bInput" class="rgb-input" min="0" max="255" placeholder="0">
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn btn-primary" id="rgbToHexBtn">
+                        <span>🔄</span> Convert RGB to HEX
+                    </button>
+                </div>
+            </div>
+
+            <div class="history-section" id="historySection">
+                <h3>📚 Recent Conversions</h3>
+                <div class="history-grid" id="historyGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        Color copied to clipboard!
+    </div>
+
+    <script>
+        class HEXtoRGBConverter {
+            constructor() {
+                this.hexInput = document.getElementById('hexInput');
+                this.hexContainer = document.getElementById('hexContainer');
+                this.validationIcon = document.getElementById('validationIcon');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.colorPreview = document.getElementById('colorPreview');
+                this.hexOutput = document.getElementById('hexOutput');
+                this.rgbOutput = document.getElementById('rgbOutput');
+                this.rgbValues = document.getElementById('rgbValues');
+                this.notification = document.getElementById('notification');
+                this.historySection = document.getElementById('historySection');
+                this.historyGrid = document.getElementById('historyGrid');
+
+                this.rInput = document.getElementById('rInput');
+                this.gInput = document.getElementById('gInput');
+                this.bInput = document.getElementById('bInput');
+
+                this.conversions = [];
+                this.currentHex = '#000000';
+                this.currentRGB = { r: 0, g: 0, b: 0 };
+
+                this.initEventListeners();
+                this.loadHistory();
+            }
+
+            initEventListeners() {
+                // HEX input events
+                this.hexInput.addEventListener('input', this.handleHexInput.bind(this));
+                this.hexInput.addEventListener('paste', this.handlePaste.bind(this));
+
+                // RGB input events
+                [this.rInput, this.gInput, this.bInput].forEach(input => {
+                    input.addEventListener('input', this.handleRGBInput.bind(this));
+                });
+
+                // Button events
+                document.getElementById('convertBtn').addEventListener('click', this.convert.bind(this));
+                document.getElementById('clearBtn').addEventListener('click', this.clear.bind(this));
+                document.getElementById('copyAllBtn').addEventListener('click', this.copyAll.bind(this));
+                document.getElementById('rgbToHexBtn').addEventListener('click', this.convertRGBtoHEX.bind(this));
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'Enter') {
+                            this.convert();
+                        } else if (e.key === 'c' && e.shiftKey) {
+                            this.copyAll();
+                        }
+                    }
+                });
+            }
+
+            handleHexInput(e) {
+                let value = e.target.value.replace(/[^a-fA-F0-9]/g, '').toUpperCase();
+                e.target.value = value;
+                this.validateAndConvert(value);
+            }
+
+            handlePaste(e) {
+                e.preventDefault();
+                let paste = (e.clipboardData || window.clipboardData).getData('text');
+                paste = paste.replace(/[^a-fA-F0-9]/g, '').toUpperCase();
+                
+                if (paste.length > 6) {
+                    paste = paste.substring(0, 6);
+                }
+                
+                this.hexInput.value = paste;
+                this.validateAndConvert(paste);
+            }
+
+            handleRGBInput() {
+                const r = parseInt(this.rInput.value) || 0;
+                const g = parseInt(this.gInput.value) || 0;
+                const b = parseInt(this.bInput.value) || 0;
+
+                // Validate RGB values
+                const validR = Math.max(0, Math.min(255, r));
+                const validG = Math.max(0, Math.min(255, g));
+                const validB = Math.max(0, Math.min(255, b));
+
+                if (r !== validR) this.rInput.value = validR;
+                if (g !== validG) this.gInput.value = validG;
+                if (b !== validB) this.bInput.value = validB;
+
+                // Update preview
+                const hex = this.rgbToHex(validR, validG, validB);
+                this.updateDisplay(hex, { r: validR, g: validG, b: validB });
+            }
+
+            validateAndConvert(hex) {
+                if (hex.length === 0) {
+                    this.resetDisplay();
+                    this.hideValidation();
+                    return;
+                }
+
+                if (this.isValidHex(hex)) {
+                    this.showValid();
+                    const fullHex = this.normalizeHex(hex);
+                    const rgb = this.hexToRgb(fullHex);
+                    this.updateDisplay(fullHex, rgb);
+                    this.hideError();
+                } else {
+                    this.showInvalid();
+                    this.showError();
+                }
+            }
+
+            isValidHex(hex) {
+                return /^[0-9A-F]{3}$|^[0-9A-F]{6}$/i.test(hex);
+            }
+
+            normalizeHex(hex) {
+                if (hex.length === 3) {
+                    return hex.split('').map(char => char + char).join('');
+                }
+                return hex;
+            }
+
+            hexToRgb(hex) {
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                return { r, g, b };
+            }
+
+            rgbToHex(r, g, b) {
+                return [r, g, b].map(x => {
+                    const hex = x.toString(16);
+                    return hex.length === 1 ? "0" + hex : hex;
+                }).join('').toUpperCase();
+            }
+
+            updateDisplay(hex, rgb) {
+                this.currentHex = '#' + hex;
+                this.currentRGB = rgb;
+
+                this.colorPreview.style.backgroundColor = this.currentHex;
+                this.colorPreview.textContent = '';
+                
+                this.hexOutput.textContent = this.currentHex;
+                this.rgbOutput.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+                this.rgbValues.textContent = `R: ${rgb.r}, G: ${rgb.g}, B: ${rgb.b}`;
+
+                // Update RGB inputs
+                this.rInput.value = rgb.r;
+                this.gInput.value = rgb.g;
+                this.bInput.value = rgb.b;
+            }
+
+            resetDisplay() {
+                this.colorPreview.style.backgroundColor = '#f8f9fa';
+                this.colorPreview.textContent = 'Enter a HEX code to see the color';
+                this.hexOutput.textContent = '#000000';
+                this.rgbOutput.textContent = 'rgb(0, 0, 0)';
+                this.rgbValues.textContent = 'R: 0, G: 0, B: 0';
+            }
+
+            showValid() {
+                this.hexContainer.className = 'hex-input-container valid';
+                this.validationIcon.textContent = '✓';
+                this.validationIcon.className = 'validation-icon valid';
+            }
+
+            showInvalid() {
+                this.hexContainer.className = 'hex-input-container invalid';
+                this.validationIcon.textContent = '✗';
+                this.validationIcon.className = 'validation-icon invalid';
+            }
+
+            hideValidation() {
+                this.hexContainer.className = 'hex-input-container';
+                this.validationIcon.textContent = '';
+                this.validationIcon.className = 'validation-icon';
+            }
+
+            showError() {
+                this.errorMessage.style.display = 'block';
+            }
+
+            hideError() {
+                this.errorMessage.style.display = 'none';
+            }
+
+            convert() {
+                const hex = this.hexInput.value.trim();
+                if (hex && this.isValidHex(hex)) {
+                    this.addToHistory(this.currentHex, this.currentRGB);
+                    this.showNotification('Color converted successfully!');
+                } else {
+                    this.showNotification('Please enter a valid HEX code first!');
+                }
+            }
+
+            convertRGBtoHEX() {
+                const r = parseInt(this.rInput.value) || 0;
+                const g = parseInt(this.gInput.value) || 0;
+                const b = parseInt(this.bInput.value) || 0;
+
+                const hex = this.rgbToHex(r, g, b);
+                this.hexInput.value = hex;
+                this.validateAndConvert(hex);
+                this.addToHistory('#' + hex, { r, g, b });
+                this.showNotification('RGB converted to HEX successfully!');
+            }
+
+            clear() {
+                this.hexInput.value = '';
+                this.rInput.value = '';
+                this.gInput.value = '';
+                this.bInput.value = '';
+                this.resetDisplay();
+                this.hideValidation();
+                this.hideError();
+                this.showNotification('Fields cleared!');
+            }
+
+            copyAll() {
+                const allData = `HEX: ${this.currentHex}\nRGB: rgb(${this.currentRGB.r}, ${this.currentRGB.g}, ${this.currentRGB.b})\nValues: R: ${this.currentRGB.r}, G: ${this.currentRGB.g}, B: ${this.currentRGB.b}`;
+                this.copyToClipboard(allData);
+            }
+
+            async copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    this.showNotification('Copied to clipboard!');
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showNotification('Copied to clipboard!');
+                }
+            }
+
+            showNotification(message) {
+                this.notification.textContent = message;
+                this.notification.classList.add('show');
+                setTimeout(() => {
+                    this.notification.classList.remove('show');
+                }, 3000);
+            }
+
+            addToHistory(hex, rgb) {
+                // Check if color already exists
+                const exists = this.conversions.some(conv => conv.hex === hex);
+                if (exists) return;
+
+                const conversion = {
+                    hex,
+                    rgb,
+                    timestamp: Date.now()
+                };
+
+                this.conversions.unshift(conversion);
+                this.conversions = this.conversions.slice(0, 12); // Keep only last 12
+
+                this.updateHistoryDisplay();
+                this.saveHistory();
+            }
+
+            updateHistoryDisplay() {
+                if (this.conversions.length === 0) {
+                    this.historySection.style.display = 'none';
+                    return;
+                }
+
+                this.historySection.style.display = 'block';
+                this.historyGrid.innerHTML = '';
+
+                this.conversions.forEach(conversion => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="history-color" style="background-color: ${conversion.hex}"></div>
+                        <div class="history-hex">${conversion.hex}</div>
+                        <div class="history-rgb">rgb(${conversion.rgb.r}, ${conversion.rgb.g}, ${conversion.rgb.b})</div>
+                    `;
+
+                    item.addEventListener('click', () => {
+                        this.hexInput.value = conversion.hex.substring(1);
+                        this.validateAndConvert(conversion.hex.substring(1));
+                    });
+
+                    this.historyGrid.appendChild(item);
+                });
+            }
+
+            saveHistory() {
+                localStorage.setItem('hexRgbHistory', JSON.stringify(this.conversions));
+            }
+
+            loadHistory() {
+                try {
+                    const saved = localStorage.getItem('hexRgbHistory');
+                    if (saved) {
+                        this.conversions = JSON.parse(saved);
+                        this.updateHistoryDisplay();
+                    }
+                } catch (error) {
+                    console.log('No saved history found');
+                }
+            }
+        }
+
+        // Global function for copy buttons
+        function copyToClipboard(format) {
+            const converter = window.hexRgbConverter;
+            let text = '';
+            
+            switch (format) {
+                case 'hex':
+                    text = converter.currentHex;
+                    break;
+                case 'rgb':
+                    text = `rgb(${converter.currentRGB.r}, ${converter.currentRGB.g}, ${converter.currentRGB.b})`;
+                    break;
+                case 'values':
+                    text = `R: ${converter.currentRGB.r}, G: ${converter.currentRGB.g}, B: ${converter.currentRGB.b}`;
+                    break;
+            }
+            
+            converter.copyToClipboard(text);
+        }
+
+        // Initialize the converter when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.hexRgbConverter = new HEXtoRGBConverter();
+        });
+    </script>
+</body>
+</html>
