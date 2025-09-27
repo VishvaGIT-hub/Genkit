@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Density Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .results-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .section-title {
+            color: #007bff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .text-input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input-section:focus-within {
+            border-color: #007bff;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .char-counter {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        #textInput {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        #textInput:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .options-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .option-group {
+            margin-bottom: 20px;
+        }
+
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-label {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007bff;
+        }
+
+        .checkbox-option label {
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .slider-option {
+            margin-bottom: 10px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            font-weight: 600;
+            color: #007bff;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .stats-overview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .results-display {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .results-title {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 5px;
+        }
+
+        .sort-btn {
+            background: #e9ecef;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .sort-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .keyword-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .keyword-item:hover {
+            border-color: #007bff;
+            transform: translateX(2px);
+        }
+
+        .keyword-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .keyword-word {
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .keyword-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .keyword-count {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .keyword-percentage {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .keyword-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .keyword-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-top: 20px;
+        }
+
+        .export-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .keyword-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .keyword-stats {
+                align-self: flex-end;
+            }
+
+            .export-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-panel,
+            .results-panel {
+                padding: 20px;
+            }
+
+            #textInput {
+                min-height: 150px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Keyword Density Checker</h1>
+            <p>Analyze text content to identify keyword frequency and density for SEO optimization</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-panel">
+                <div class="section-title">Text Analysis</div>
+                
+                <div class="text-input-section">
+                    <div class="input-label">
+                        <span>📝 Enter Your Text</span>
+                        <span class="char-counter" id="charCounter">0 characters</span>
+                    </div>
+                    <textarea id="textInput" placeholder="Paste or type your text here for keyword density analysis. The tool will automatically count word frequency and calculate percentages..."></textarea>
+                </div>
+
+                <div class="options-section">
+                    <div class="option-group">
+                        <label class="option-label">⚙️ Analysis Options</label>
+                        
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="excludeStopWords" checked>
+                            <label for="excludeStopWords">Exclude common stop words (the, and, is, etc.)</label>
+                        </div>
+                        
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="caseSensitive">
+                            <label for="caseSensitive">Case sensitive analysis</label>
+                        </div>
+                        
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="includeNumbers">
+                            <label for="includeNumbers">Include numbers in analysis</label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">📏 Minimum Word Length</label>
+                        <div class="slider-option">
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="minWordLength" min="1" max="10" value="3">
+                                <span class="slider-value" id="minWordValue">3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">🔢 Minimum Frequency</label>
+                        <div class="slider-option">
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="minFrequency" min="1" max="10" value="2">
+                                <span class="slider-value" id="minFreqValue">2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="analyzeBtn">
+                        <span>🔍</span> Analyze Text
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <div class="section-title">Analysis Results</div>
+                
+                <div class="stats-overview">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalWords">0</div>
+                            <div class="stat-label">Total Words</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="uniqueWords">0</div>
+                            <div class="stat-label">Unique Words</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avgWordLength">0</div>
+                            <div class="stat-label">Avg Length</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="topKeywordDensity">0%</div>
+                            <div class="stat-label">Top Density</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-display">
+                    <div class="results-header">
+                        <div class="results-title">Keyword Frequency</div>
+                        <div class="sort-options">
+                            <button class="sort-btn active" data-sort="frequency">Frequency</button>
+                            <button class="sort-btn" data-sort="alphabetical">A-Z</button>
+                            <button class="sort-btn" data-sort="length">Length</button>
+                        </div>
+                    </div>
+                    
+                    <div class="keyword-list" id="keywordList">
+                        <div class="no-results">
+                            Enter text above and click "Analyze Text" to see keyword density results
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <div class="export-title">📤 Export Results</div>
+                    <div class="export-actions">
+                        <button class="btn btn-success" id="copyBtn">
+                            <span>📋</span> Copy Results
+                        </button>
+                        <button class="btn btn-success" id="exportCsvBtn">
+                            <span>📄</span> Export CSV
+                        </button>
+                        <button class="btn btn-success" id="exportJsonBtn">
+                            <span>📊</span> Export JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        Analysis completed successfully!
+    </div>
+
+    <script>
+        class KeywordDensityChecker {
+            constructor() {
+                this.textInput = document.getElementById('textInput');
+                this.analysisResults = [];
+                this.textStats = {};
+                this.currentSort = 'frequency';
+                
+                // Common stop words in multiple languages
+                this.stopWords = new Set([
+                    // English stop words
+                    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'he', 'in', 'is', 'it',
+                    'its', 'of', 'on', 'that', 'the', 'to', 'was', 'will', 'with', 'would', 'you', 'your', 'have',
+                    'had', 'has', 'having', 'do', 'does', 'did', 'doing', 'can', 'could', 'should', 'would', 'may',
+                    'might', 'must', 'shall', 'will', 'am', 'is', 'are', 'was', 'were', 'been', 'being', 'have',
+                    'has', 'had', 'having', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might',
+                    'must', 'can', 'shall', 'about', 'above', 'across', 'after', 'against', 'along', 'among',
+                    'around', 'because', 'before', 'behind', 'below', 'beneath', 'beside', 'between', 'beyond',
+                    'during', 'except', 'inside', 'into', 'like', 'near', 'off', 'outside', 'over', 'since',
+                    'through', 'throughout', 'till', 'toward', 'under', 'until', 'up', 'upon', 'within', 'without',
+                    'all', 'another', 'any', 'anybody', 'anyone', 'anything', 'both', 'each', 'either', 'everybody',
+                    'everyone', 'everything', 'few', 'many', 'nobody', 'none', 'nothing', 'one', 'other', 'others',
+                    'several', 'some', 'somebody', 'someone', 'something', 'this', 'that', 'these', 'those', 'what',
+                    'which', 'who', 'whom', 'whose', 'where', 'when', 'why', 'how', 'if', 'or', 'nor', 'but', 'so',
+                    'yet', 'also', 'however', 'therefore', 'thus', 'moreover', 'furthermore', 'nevertheless',
+                    'meanwhile', 'otherwise', 'instead', 'besides', 'accordingly', 'consequently', 'hence'
+                ]);
+
+                this.initEventListeners();
+                this.updateCharCounter();
+            }
+
+            initEventListeners() {
+                // Text input events
+                this.textInput.addEventListener('input', () => {
+                    this.updateCharCounter();
+                });
+
+                // Slider events
+                document.getElementById('minWordLength').addEventListener('input', (e) => {
+                    document.getElementById('minWordValue').textContent = e.target.value;
+                });
+
+                document.getElementById('minFrequency').addEventListener('input', (e) => {
+                    document.getElementById('minFreqValue').textContent = e.target.value;
+                });
+
+                // Button events
+                document.getElementById('analyzeBtn').addEventListener('click', () => this.analyzeText());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
+                document.getElementById('copyBtn').addEventListener('click', () => this.copyResults());
+                document.getElementById('exportCsvBtn').addEventListener('click', () => this.exportCsv());
+                document.getElementById('exportJsonBtn').addEventListener('click', () => this.exportJson());
+
+                // Sort buttons
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.changeSortOrder(e.target.dataset.sort);
+                    });
+                });
+
+                // Real-time analysis option
+                this.textInput.addEventListener('input', this.debounce(() => {
+                    if (this.textInput.value.trim().length > 50) {
+                        this.analyzeText();
+                    }
+                }, 1000));
+            }
+
+            updateCharCounter() {
+                const text = this.textInput.value;
+                const charCount = text.length;
+                const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+                
+                document.getElementById('charCounter').textContent = 
+                    `${charCount} characters, ${wordCount} words`;
+            }
+
+            analyzeText() {
+                const text = this.textInput.value.trim();
+                
+                if (!text) {
+                    this.showNotification('Please enter some text to analyze', 'error');
+                    return;
+                }
+
+                if (text.length < 10) {
+                    this.showNotification('Text is too short for meaningful analysis', 'error');
+                    return;
+                }
+
+                const options = this.getAnalysisOptions();
+                const words = this.extractWords(text, options);
+                const wordCounts = this.countWords(words, options);
+                const filteredResults = this.filterResults(wordCounts, options);
+
+                this.analysisResults = filteredResults;
+                this.textStats = this.calculateTextStats(words, filteredResults);
+
+                this.displayResults();
+                this.showNotification('Text analysis completed successfully!');
+            }
+
+            getAnalysisOptions() {
+                return {
+                    excludeStopWords: document.getElementById('excludeStopWords').checked,
+                    caseSensitive: document.getElementById('caseSensitive').checked,
+                    includeNumbers: document.getElementById('includeNumbers').checked,
+                    minWordLength: parseInt(document.getElementById('minWordLength').value),
+                    minFrequency: parseInt(document.getElementById('minFrequency').value)
+                };
+            }
+
+            extractWords(text, options) {
+                // Remove unwanted characters and normalize
+                let cleanText = text.replace(/[^\w\s'-]/g, ' ');
+                
+                if (!options.includeNumbers) {
+                    cleanText = cleanText.replace(/\b\d+\b/g, ' ');
+                }
+
+                // Split into words
+                let words = cleanText.split(/\s+/).filter(word => word.length > 0);
+
+                // Apply case sensitivity
+                if (!options.caseSensitive) {
+                    words = words.map(word => word.toLowerCase());
+                }
+
+                // Filter by minimum length
+                words = words.filter(word => word.length >= options.minWordLength);
+
+                // Remove stop words if option is enabled
+                if (options.excludeStopWords) {
+                    words = words.filter(word => !this.stopWords.has(word.toLowerCase()));
+                }
+
+                return words;
+            }
+
+            countWords(words, options) {
+                const wordCounts = new Map();
+                const totalWords = words.length;
+
+                words.forEach(word => {
+                    const count = wordCounts.get(word) || 0;
+                    wordCounts.set(word, count + 1);
+                });
+
+                const results = [];
+                wordCounts.forEach((count, word) => {
+                    const percentage = ((count / totalWords) * 100).toFixed(2);
+                    results.push({
+                        word: word,
+                        count: count,
+                        percentage: parseFloat(percentage),
+                        length: word.length
+                    });
+                });
+
+                return results;
+            }
+
+            filterResults(results, options) {
+                return results.filter(item => item.count >= options.minFrequency);
+            }
+
+            calculateTextStats(words, results) {
+                const totalWords = words.length;
+                const uniqueWords = results.length;
+                const avgWordLength = words.length > 0 ? 
+                    (words.reduce((sum, word) => sum + word.length, 0) / words.length).toFixed(1) : 0;
+                const topKeywordDensity = results.length > 0 ? results[0].percentage : 0;
+
+                return {
+                    totalWords,
+                    uniqueWords,
+                    avgWordLength,
+                    topKeywordDensity
+                };
+            }
+
+            displayResults() {
+                this.updateStatistics();
+                this.displayKeywordList();
+            }
+
+            updateStatistics() {
+                document.getElementById('totalWords').textContent = this.textStats.totalWords.toLocaleString();
+                document.getElementById('uniqueWords').textContent = this.textStats.uniqueWords.toLocaleString();
+                document.getElementById('avgWordLength').textContent = this.textStats.avgWordLength;
+                document.getElementById('topKeywordDensity').textContent = `${this.textStats.topKeywordDensity}%`;
+            }
+
+            displayKeywordList() {
+                const listContainer = document.getElementById('keywordList');
+                
+                if (this.analysisResults.length === 0) {
+                    listContainer.innerHTML = '<div class="no-results">No keywords found matching the current criteria</div>';
+                    return;
+                }
+
+                const sortedResults = this.sortResults(this.analysisResults, this.currentSort);
+                const maxCount = Math.max(...sortedResults.map(item => item.count));
+
+                listContainer.innerHTML = sortedResults.map(item => {
+                    const barWidth = (item.count / maxCount) * 100;
+                    
+                    return `
+                        <div class="keyword-item" onclick="keywordChecker.copyKeyword('${item.word}')">
+                            <div class="keyword-row">
+                                <span class="keyword-word">${this.escapeHtml(item.word)}</span>
+                                <div class="keyword-stats">
+                                    <span class="keyword-count">${item.count}x</span>
+                                    <span class="keyword-percentage">${item.percentage}%</span>
+                                </div>
+                            </div>
+                            <div class="keyword-bar">
+                                <div class="keyword-fill" style="width: ${barWidth}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            sortResults(results, sortType) {
+                const sorted = [...results];
+                
+                switch (sortType) {
+                    case 'frequency':
+                        return sorted.sort((a, b) => b.count - a.count);
+                    case 'alphabetical':
+                        return sorted.sort((a, b) => a.word.localeCompare(b.word));
+                    case 'length':
+                        return sorted.sort((a, b) => b.length - a.length);
+                    default:
+                        return sorted;
+                }
+            }
+
+            changeSortOrder(sortType) {
+                document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`[data-sort="${sortType}"]`).classList.add('active');
+                
+                this.currentSort = sortType;
+                this.displayKeywordList();
+            }
+
+            copyKeyword(word) {
+                this.copyToClipboard(word);
+                this.showNotification(`Keyword "${word}" copied to clipboard!`);
+            }
+
+            copyResults() {
+                if (this.analysisResults.length === 0) {
+                    this.showNotification('No results to copy', 'error');
+                    return;
+                }
+
+                let output = 'Keyword Density Analysis Results\n';
+                output += '================================\n\n';
+                output += `Total Words: ${this.textStats.totalWords}\n`;
+                output += `Unique Words: ${this.textStats.uniqueWords}\n`;
+                output += `Average Word Length: ${this.textStats.avgWordLength}\n`;
+                output += `Top Keyword Density: ${this.textStats.topKeywordDensity}%\n\n`;
+                output += 'Keyword\t\tFrequency\tDensity\n';
+                output += '-------\t\t---------\t-------\n';
+
+                const sortedResults = this.sortResults(this.analysisResults, this.currentSort);
+                sortedResults.forEach(item => {
+                    output += `${item.word}\t\t${item.count}\t\t${item.percentage}%\n`;
+                });
+
+                this.copyToClipboard(output);
+                this.showNotification('Results copied to clipboard!');
+            }
+
+            exportCsv() {
+                if (this.analysisResults.length === 0) {
+                    this.showNotification('No results to export', 'error');
+                    return;
+                }
+
+                let csv = 'Keyword,Frequency,Density (%),Length\n';
+                const sortedResults = this.sortResults(this.analysisResults, this.currentSort);
+                
+                sortedResults.forEach(item => {
+                    csv += `"${item.word}",${item.count},${item.percentage},${item.length}\n`;
+                });
+
+                this.downloadFile(csv, 'keyword-density-analysis.csv', 'text/csv');
+                this.showNotification('CSV file downloaded successfully!');
+            }
+
+            exportJson() {
+                if (this.analysisResults.length === 0) {
+                    this.showNotification('No results to export', 'error');
+                    return;
+                }
+
+                const exportData = {
+                    analysis_date: new Date().toISOString(),
+                    text_statistics: this.textStats,
+                    keywords: this.sortResults(this.analysisResults, this.currentSort),
+                    options: this.getAnalysisOptions()
+                };
+
+                const json = JSON.stringify(exportData, null, 2);
+                this.downloadFile(json, 'keyword-density-analysis.json', 'application/json');
+                this.showNotification('JSON file downloaded successfully!');
+            }
+
+            clearAll() {
+                this.textInput.value = '';
+                this.analysisResults = [];
+                this.textStats = {};
+                
+                // Reset options
+                document.getElementById('excludeStopWords').checked = true;
+                document.getElementById('caseSensitive').checked = false;
+                document.getElementById('includeNumbers').checked = false;
+                document.getElementById('minWordLength').value = 3;
+                document.getElementById('minFrequency').value = 2;
+                document.getElementById('minWordValue').textContent = '3';
+                document.getElementById('minFreqValue').textContent = '2';
+                
+                // Reset statistics
+                document.getElementById('totalWords').textContent = '0';
+                document.getElementById('uniqueWords').textContent = '0';
+                document.getElementById('avgWordLength').textContent = '0';
+                document.getElementById('topKeywordDensity').textContent = '0%';
+                
+                // Reset results display
+                document.getElementById('keywordList').innerHTML = 
+                    '<div class="no-results">Enter text above and click "Analyze Text" to see keyword density results</div>';
+                
+                this.updateCharCounter();
+                this.showNotification('All data cleared successfully!');
+            }
+
+            async copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+            }
+
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the keyword density checker
+        let keywordChecker;
+        document.addEventListener('DOMContentLoaded', () => {
+            keywordChecker = new KeywordDensityChecker();
+        });
+    </script>
+</body>
+</html>
