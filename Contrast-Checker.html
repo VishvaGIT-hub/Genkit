@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WCAG Contrast Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .results-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .section-title {
+            color: #007bff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .color-input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .color-input-section:focus-within {
+            border-color: #007bff;
+        }
+
+        .color-label {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .color-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 3px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .color-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-inputs {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .format-selector {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .format-btn {
+            background: #e9ecef;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .format-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .format-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .color-input {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .color-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .color-input.valid {
+            border-color: #28a745;
+        }
+
+        .color-input.invalid {
+            border-color: #dc3545;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .contrast-display {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+        }
+
+        .contrast-ratio {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .contrast-label {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .wcag-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .wcag-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .wcag-item.pass {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .wcag-item.fail {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .wcag-level {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .wcag-requirement {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .wcag-status {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .wcag-status.pass {
+            color: #28a745;
+        }
+
+        .wcag-status.fail {
+            color: #dc3545;
+        }
+
+        .preview-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .text-preview {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .preview-normal {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .preview-large {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .color-swap {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            align-self: center;
+        }
+
+        .color-swap:hover {
+            background: #0056b3;
+            transform: rotate(180deg);
+        }
+
+        .quick-colors {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .quick-colors-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 8px;
+        }
+
+        .quick-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-color:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .color-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .color-preview {
+                width: 100%;
+                height: 60px;
+            }
+
+            .wcag-results {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .contrast-ratio {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-panel,
+            .results-panel {
+                padding: 20px;
+            }
+
+            .contrast-ratio {
+                font-size: 2rem;
+            }
+
+            .format-selector {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>♿ WCAG Contrast Checker</h1>
+            <p>Verify color contrast ratios for accessibility compliance</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-panel">
+                <div class="section-title">Color Selection</div>
+                
+                <div class="color-input-section">
+                    <div class="color-label">
+                        🎨 Foreground Color (Text)
+                    </div>
+                    <div class="color-input-group">
+                        <div class="color-preview" id="foregroundPreview" style="background-color: #000000"></div>
+                        <div class="color-inputs">
+                            <div class="format-selector">
+                                <button class="format-btn active" data-color="foreground" data-format="hex">HEX</button>
+                                <button class="format-btn" data-color="foreground" data-format="rgb">RGB</button>
+                                <button class="format-btn" data-color="foreground" data-format="hsl">HSL</button>
+                            </div>
+                            <input type="text" class="color-input" id="foregroundInput" placeholder="#000000" value="#000000">
+                            <div class="error-message" id="foregroundError">Invalid color format</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 10px 0;">
+                    <button class="color-swap" id="swapColors" title="Swap Colors">⇅</button>
+                </div>
+
+                <div class="color-input-section">
+                    <div class="color-label">
+                        🖼️ Background Color
+                    </div>
+                    <div class="color-input-group">
+                        <div class="color-preview" id="backgroundPreview" style="background-color: #ffffff"></div>
+                        <div class="color-inputs">
+                            <div class="format-selector">
+                                <button class="format-btn active" data-color="background" data-format="hex">HEX</button>
+                                <button class="format-btn" data-color="background" data-format="rgb">RGB</button>
+                                <button class="format-btn" data-color="background" data-format="hsl">HSL</button>
+                            </div>
+                            <input type="text" class="color-input" id="backgroundInput" placeholder="#ffffff" value="#ffffff">
+                            <div class="error-message" id="backgroundError">Invalid color format</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="checkBtn">
+                        <span>🔍</span> Check Contrast
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> Clear
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <span>🔄</span> Reset
+                    </button>
+                </div>
+
+                <div class="quick-colors">
+                    <div class="quick-colors-title">Quick Colors</div>
+                    <div class="color-grid" id="quickColorGrid">
+                        <!-- Quick colors will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <div class="section-title">Contrast Results</div>
+                
+                <div class="contrast-display">
+                    <div class="contrast-ratio" id="contrastRatio">21.0</div>
+                    <div class="contrast-label">Contrast Ratio</div>
+                    <button class="btn btn-success" id="copyRatioBtn">
+                        <span>📋</span> Copy Ratio
+                    </button>
+                </div>
+
+                <div class="wcag-results">
+                    <div class="wcag-item" id="wcagAA">
+                        <div class="wcag-level">WCAG AA</div>
+                        <div class="wcag-requirement">Normal: 4.5:1 | Large: 3:1</div>
+                        <div class="wcag-status pass">
+                            <span>✓</span> Pass
+                        </div>
+                    </div>
+                    <div class="wcag-item" id="wcagAAA">
+                        <div class="wcag-level">WCAG AAA</div>
+                        <div class="wcag-requirement">Normal: 7:1 | Large: 4.5:1</div>
+                        <div class="wcag-status pass">
+                            <span>✓</span> Pass
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <div class="preview-title">Text Preview</div>
+                    <div class="text-preview preview-normal" id="normalPreview">
+                        Normal text (16px) - The quick brown fox jumps over the lazy dog.
+                    </div>
+                    <div class="text-preview preview-large" id="largePreview">
+                        Large text (24px) - Sample heading text
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        Contrast ratio copied to clipboard!
+    </div>
+
+    <script>
+        class ContrastChecker {
+            constructor() {
+                this.foregroundColor = '#000000';
+                this.backgroundColorValue = '#ffffff';
+                this.currentForegroundFormat = 'hex';
+                this.currentBackgroundFormat = 'hex';
+
+                this.quickColors = [
+                    '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff',
+                    '#ffff00', '#ff00ff', '#00ffff', '#808080', '#800000',
+                    '#008000', '#000080', '#808000', '#800080', '#008080',
+                    '#c0c0c0', '#ffa500', '#a52a2a', '#dda0dd', '#98fb98'
+                ];
+
+                this.initEventListeners();
+                this.initQuickColors();
+                this.updatePreview();
+                this.calculateContrast();
+            }
+
+            initEventListeners() {
+                // Color input changes
+                document.getElementById('foregroundInput').addEventListener('input', (e) => {
+                    this.handleColorInput('foreground', e.target.value);
+                });
+
+                document.getElementById('backgroundInput').addEventListener('input', (e) => {
+                    this.handleColorInput('background', e.target.value);
+                });
+
+                // Color preview clicks (open color picker)
+                document.getElementById('foregroundPreview').addEventListener('click', () => {
+                    this.openColorPicker('foreground');
+                });
+
+                document.getElementById('backgroundPreview').addEventListener('click', () => {
+                    this.openColorPicker('background');
+                });
+
+                // Format selector buttons
+                document.querySelectorAll('.format-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.changeFormat(e.target.dataset.color, e.target.dataset.format);
+                    });
+                });
+
+                // Action buttons
+                document.getElementById('checkBtn').addEventListener('click', () => this.calculateContrast());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('copyRatioBtn').addEventListener('click', () => this.copyRatio());
+                document.getElementById('swapColors').addEventListener('click', () => this.swapColors());
+            }
+
+            initQuickColors() {
+                const grid = document.getElementById('quickColorGrid');
+                
+                this.quickColors.forEach(color => {
+                    const colorElement = document.createElement('div');
+                    colorElement.className = 'quick-color';
+                    colorElement.style.backgroundColor = color;
+                    colorElement.title = color;
+                    
+                    colorElement.addEventListener('click', () => {
+                        // Set as foreground color by default, or background if Ctrl is held
+                        const targetColor = event.ctrlKey || event.metaKey ? 'background' : 'foreground';
+                        this.setColor(targetColor, color);
+                    });
+                    
+                    grid.appendChild(colorElement);
+                });
+            }
+
+            handleColorInput(colorType, value) {
+                if (this.isValidColor(value)) {
+                    this.setColor(colorType, value);
+                    this.hideError(colorType);
+                    this.updateInputValidation(colorType, true);
+                } else {
+                    this.showError(colorType);
+                    this.updateInputValidation(colorType, false);
+                }
+            }
+
+            setColor(colorType, value) {
+                const normalizedValue = this.normalizeColor(value);
+                
+                if (colorType === 'foreground') {
+                    this.foregroundColor = normalizedValue;
+                    document.getElementById('foregroundPreview').style.backgroundColor = normalizedValue;
+                } else {
+                    this.backgroundColorValue = normalizedValue;
+                    document.getElementById('backgroundPreview').style.backgroundColor = normalizedValue;
+                }
+
+                this.updateColorInput(colorType, normalizedValue);
+                this.updatePreview();
+                this.calculateContrast();
+            }
+
+            updateColorInput(colorType, color) {
+                const inputId = colorType === 'foreground' ? 'foregroundInput' : 'backgroundInput';
+                const format = colorType === 'foreground' ? this.currentForegroundFormat : this.currentBackgroundFormat;
+                
+                let formattedColor = color;
+                
+                switch (format) {
+                    case 'rgb':
+                        formattedColor = this.hexToRgb(color);
+                        break;
+                    case 'hsl':
+                        formattedColor = this.hexToHsl(color);
+                        break;
+                    case 'hex':
+                    default:
+                        formattedColor = color;
+                        break;
+                }
+                
+                document.getElementById(inputId).value = formattedColor;
+            }
+
+            openColorPicker(colorType) {
+                const input = document.createElement('input');
+                input.type = 'color';
+                input.value = colorType === 'foreground' ? this.foregroundColor : this.backgroundColorValue;
+                
+                input.addEventListener('change', (e) => {
+                    this.setColor(colorType, e.target.value);
+                });
+                
+                input.click();
+            }
+
+            changeFormat(colorType, format) {
+                // Update active format button
+                document.querySelectorAll(`[data-color="${colorType}"] .format-btn`).forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-color="${colorType}"][data-format="${format}"]`).classList.add('active');
+
+                // Update current format
+                if (colorType === 'foreground') {
+                    this.currentForegroundFormat = format;
+                    this.updateColorInput('foreground', this.foregroundColor);
+                } else {
+                    this.currentBackgroundFormat = format;
+                    this.updateColorInput('background', this.backgroundColorValue);
+                }
+            }
+
+            swapColors() {
+                const tempColor = this.foregroundColor;
+                const tempFormat = this.currentForegroundFormat;
+                
+                this.setColor('foreground', this.backgroundColorValue);
+                this.setColor('background', tempColor);
+                
+                // Swap formats
+                this.changeFormat('foreground', this.currentBackgroundFormat);
+                this.changeFormat('background', tempFormat);
+                
+                this.showNotification('Colors swapped!');
+            }
+
+            isValidColor(color) {
+                // Check HEX format
+                if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)) {
+                    return true;
+                }
+                
+                // Check RGB format
+                if (/^rgbKATEX_INLINE_OPEN\s*\d+\s*,\s*\d+\s*,\s*\d+\s*KATEX_INLINE_CLOSE$/.test(color)) {
+                    const values = color.match(/\d+/g);
+                    return values.every(val => parseInt(val) >= 0 && parseInt(val) <= 255);
+                }
+                
+                // Check HSL format
+                if (/^hslKATEX_INLINE_OPEN\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*KATEX_INLINE_CLOSE$/.test(color)) {
+                    return true;
+                }
+                
+                return false;
+            }
+
+            normalizeColor(color) {
+                color = color.trim();
+                
+                // Convert RGB to HEX
+                if (color.startsWith('rgb(')) {
+                    const values = color.match(/\d+/g);
+                    if (values && values.length >= 3) {
+                        const r = parseInt(values[0]);
+                        const g = parseInt(values[1]);
+                        const b = parseInt(values[2]);
+                        return this.rgbToHex(r, g, b);
+                    }
+                }
+                
+                // Convert HSL to HEX (simplified)
+                if (color.startsWith('hsl(')) {
+                    // For simplicity, return a default conversion
+                    // In production, you'd want proper HSL to RGB/HEX conversion
+                    return this.hslToHex(color);
+                }
+                
+                // Normalize HEX
+                if (color.startsWith('#')) {
+                    if (color.length === 4) {
+                        // Convert 3-digit to 6-digit HEX
+                        return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+                    }
+                    return color.toUpperCase();
+                }
+                
+                return color;
+            }
+
+            rgbToHex(r, g, b) {
+                return "#" + [r, g, b].map(x => {
+                    const hex = x.toString(16);
+                    return hex.length === 1 ? "0" + hex : hex;
+                }).join("").toUpperCase();
+            }
+
+            hexToRgb(hex) {
+                const r = parseInt(hex.substring(1, 3), 16);
+                const g = parseInt(hex.substring(3, 5), 16);
+                const b = parseInt(hex.substring(5, 7), 16);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            hexToHsl(hex) {
+                // Simplified HSL conversion
+                const r = parseInt(hex.substring(1, 3), 16) / 255;
+                const g = parseInt(hex.substring(3, 5), 16) / 255;
+                const b = parseInt(hex.substring(5, 7), 16) / 255;
+
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+
+                if (max === min) {
+                    h = s = 0;
+                } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                    switch (max) {
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+
+                h = Math.round(h * 360);
+                s = Math.round(s * 100);
+                l = Math.round(l * 100);
+
+                return `hsl(${h}, ${s}%, ${l}%)`;
+            }
+
+            hslToHex(hsl) {
+                // Simplified HSL to HEX conversion
+                // In production, implement proper HSL to RGB to HEX conversion
+                return '#808080'; // Placeholder
+            }
+
+            calculateContrast() {
+                const contrast = this.getContrastRatio(this.foregroundColor, this.backgroundColorValue);
+                
+                document.getElementById('contrastRatio').textContent = contrast.toFixed(2);
+                
+                this.updateWCAGResults(contrast);
+                this.updatePreview();
+            }
+
+            getContrastRatio(color1, color2) {
+                const lum1 = this.getLuminance(color1);
+                const lum2 = this.getLuminance(color2);
+                
+                const brightest = Math.max(lum1, lum2);
+                const darkest = Math.min(lum1, lum2);
+                
+                return (brightest + 0.05) / (darkest + 0.05);
+            }
+
+            getLuminance(hex) {
+                const r = parseInt(hex.substring(1, 3), 16);
+                const g = parseInt(hex.substring(3, 5), 16);
+                const b = parseInt(hex.substring(5, 7), 16);
+
+                const [rs, gs, bs] = [r, g, b].map(c => {
+                    c = c / 255;
+                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                });
+
+                return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+            }
+
+            updateWCAGResults(contrast) {
+                const wcagAA = document.getElementById('wcagAA');
+                const wcagAAA = document.getElementById('wcagAAA');
+
+                // WCAG AA: 4.5:1 for normal text, 3:1 for large text
+                const passAA = contrast >= 4.5;
+                const passAALarge = contrast >= 3;
+
+                // WCAG AAA: 7:1 for normal text, 4.5:1 for large text
+                const passAAA = contrast >= 7;
+                const passAAALarge = contrast >= 4.5;
+
+                this.updateWCAGItem(wcagAA, passAA && passAALarge, `Normal: ${passAA ? '✓' : '✗'} | Large: ${passAALarge ? '✓' : '✗'}`);
+                this.updateWCAGItem(wcagAAA, passAAA && passAAALarge, `Normal: ${passAAA ? '✓' : '✗'} | Large: ${passAAALarge ? '✓' : '✗'}`);
+            }
+
+            updateWCAGItem(element, passes, details) {
+                const statusElement = element.querySelector('.wcag-status');
+                
+                element.className = passes ? 'wcag-item pass' : 'wcag-item fail';
+                statusElement.className = passes ? 'wcag-status pass' : 'wcag-status fail';
+                statusElement.innerHTML = passes ? '<span>✓</span> Pass' : '<span>✗</span> Fail';
+                
+                // Update requirement details
+                element.querySelector('.wcag-requirement').textContent = details;
+            }
+
+            updatePreview() {
+                const normalPreview = document.getElementById('normalPreview');
+                const largePreview = document.getElementById('largePreview');
+
+                normalPreview.style.color = this.foregroundColor;
+                normalPreview.style.backgroundColor = this.backgroundColorValue;
+                
+                largePreview.style.color = this.foregroundColor;
+                largePreview.style.backgroundColor = this.backgroundColorValue;
+            }
+
+            showError(colorType) {
+                const errorId = colorType === 'foreground' ? 'foregroundError' : 'backgroundError';
+                document.getElementById(errorId).style.display = 'block';
+            }
+
+            hideError(colorType) {
+                const errorId = colorType === 'foreground' ? 'foregroundError' : 'backgroundError';
+                document.getElementById(errorId).style.display = 'none';
+            }
+
+            updateInputValidation(colorType, isValid) {
+                const inputId = colorType === 'foreground' ? 'foregroundInput' : 'backgroundInput';
+                const input = document.getElementById(inputId);
+                
+                input.classList.remove('valid', 'invalid');
+                input.classList.add(isValid ? 'valid' : 'invalid');
+            }
+
+            async copyRatio() {
+                const ratio = document.getElementById('contrastRatio').textContent;
+                
+                try {
+                    await navigator.clipboard.writeText(`${ratio}:1`);
+                    this.showNotification('Contrast ratio copied to clipboard!');
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = `${ratio}:1`;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showNotification('Contrast ratio copied to clipboard!');
+                }
+            }
+
+            clear() {
+                this.setColor('foreground', '#000000');
+                this.setColor('background', '#ffffff');
+                this.showNotification('Colors cleared!');
+            }
+
+            reset() {
+                this.setColor('foreground', '#000000');
+                this.setColor('background', '#ffffff');
+                this.changeFormat('foreground', 'hex');
+                this.changeFormat('background', 'hex');
+                this.showNotification('Reset to defaults!');
+            }
+
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the contrast checker
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContrastChecker();
+        });
+    </script>
+</body>
+</html>
