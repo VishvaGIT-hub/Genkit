@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .generator-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #007bff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .uuid-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-group {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .option-label {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .version-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .version-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .version-option.active {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+
+        .version-option:hover {
+            border-color: #007bff;
+        }
+
+        .version-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .version-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .format-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .format-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007bff;
+        }
+
+        .format-option label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .quantity-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .quantity-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .current-uuid {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .uuid-display {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .uuid-text {
+            font-family: 'Courier New', monospace;
+            color: #f8f8f2;
+            font-size: 1.1rem;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #0056b3;
+        }
+
+        .uuid-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .history-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-count {
+            background: #007bff;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .history-uuid {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 0.9rem;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            min-width: auto;
+        }
+
+        .validation-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .validation-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .validation-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .validation-result {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .validation-result.valid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .validation-result.invalid {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .uuid-options {
+                grid-template-columns: 1fr;
+            }
+
+            .version-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .uuid-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .history-actions {
+                align-self: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .generator-section,
+            .results-section,
+            .validation-section {
+                padding: 20px;
+            }
+
+            .uuid-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🆔 UUID Generator</h1>
+            <p>Generate unique Universal Identifiers with multiple formats and validation options</p>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="uuidTool.switchTab('generator')">🔧 Generator</button>
+                <button class="tab" onclick="uuidTool.switchTab('validator')">✅ Validator</button>
+            </div>
+
+            <div id="generator-tab" class="tab-content active">
+                <div class="generator-section">
+                    <div class="section-title">UUID Configuration</div>
+                    
+                    <div class="uuid-options">
+                        <div class="option-group">
+                            <label class="option-label">📝 UUID Version</label>
+                            <div class="version-selector">
+                                <div class="version-option active" data-version="4">
+                                    <div class="version-name">Version 4</div>
+                                    <div class="version-desc">Random</div>
+                                </div>
+                                <div class="version-option" data-version="1">
+                                    <div class="version-name">Version 1</div>
+                                    <div class="version-desc">Timestamp</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <label class="option-label">⚙️ Format Options</label>
+                            <div class="format-options">
+                                <div class="format-option">
+                                    <input type="checkbox" id="includeHyphens" checked>
+                                    <label for="includeHyphens">Include hyphens</label>
+                                </div>
+                                <div class="format-option">
+                                    <input type="checkbox" id="uppercase">
+                                    <label for="uppercase">Uppercase letters</label>
+                                </div>
+                                <div class="format-option">
+                                    <input type="checkbox" id="includeBraces">
+                                    <label for="includeBraces">Include braces { }</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <label class="option-label">🔢 Quantity</label>
+                            <div class="quantity-control">
+                                <input type="number" class="quantity-input" id="quantityInput" value="1" min="1" max="100">
+                                <span class="quantity-label">UUIDs to generate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="generateBtn">
+                            <span>🔄</span> Generate UUID
+                        </button>
+                        <button class="btn btn-success" id="copyAllBtn" style="display: none;">
+                            <span>📋</span> Copy All
+                        </button>
+                        <button class="btn btn-warning" id="exportBtn" style="display: none;">
+                            <span>💾</span> Export List
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn">
+                            <span>🗑️</span> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results-section" id="resultsSection">
+                    <div class="section-title">Generated UUIDs</div>
+                    
+                    <div id="uuidResults">
+                        <!-- Generated UUIDs will appear here -->
+                    </div>
+
+                    <div class="history-section">
+                        <div class="history-title">
+                            📚 Generation History
+                            <span class="history-count" id="historyCount">0</span>
+                        </div>
+                        <div class="history-list" id="historyList">
+                            <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                                No UUIDs generated yet
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="validator-tab" class="tab-content">
+                <div class="validation-section">
+                    <div class="section-title">UUID Validator</div>
+                    
+                    <input type="text" class="validation-input" id="validationInput" placeholder="Enter UUID to validate (e.g., 123e4567-e89b-12d3-a456-426614174000)">
+                    
+                    <div class="validation-result" id="validationResult"></div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="validateBtn">
+                            <span>✅</span> Validate UUID
+                        </button>
+                        <button class="btn btn-secondary" id="clearValidationBtn">
+                            <span>🗑️</span> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        UUID generated successfully!
+    </div>
+
+    <script>
+        class UUIDTool {
+            constructor() {
+                this.currentVersion = 4;
+                this.generatedUUIDs = [];
+                this.history = [];
+
+                this.initEventListeners();
+                this.loadHistory();
+            }
+
+            initEventListeners() {
+                // Version selection
+                document.querySelectorAll('.version-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.selectVersion(e.currentTarget);
+                    });
+                });
+
+                // Action buttons
+                document.getElementById('generateBtn').addEventListener('click', () => {
+                    this.generateUUIDs();
+                });
+
+                document.getElementById('copyAllBtn').addEventListener('click', () => {
+                    this.copyAllUUIDs();
+                });
+
+                document.getElementById('exportBtn').addEventListener('click', () => {
+                    this.exportUUIDs();
+                });
+
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearAll();
+                });
+
+                // Validation
+                document.getElementById('validateBtn').addEventListener('click', () => {
+                    this.validateUUID();
+                });
+
+                document.getElementById('clearValidationBtn').addEventListener('click', () => {
+                    this.clearValidation();
+                });
+
+                // Real-time validation
+                document.getElementById('validationInput').addEventListener('input', () => {
+                    this.validateUUID();
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.generateUUIDs();
+                        }
+                    }
+                });
+            }
+
+            selectVersion(element) {
+                document.querySelectorAll('.version-option').forEach(opt => opt.classList.remove('active'));
+                element.classList.add('active');
+                this.currentVersion = parseInt(element.dataset.version);
+            }
+
+            generateUUIDs() {
+                const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+                const clampedQuantity = Math.max(1, Math.min(100, quantity));
+                
+                if (clampedQuantity !== quantity) {
+                    document.getElementById('quantityInput').value = clampedQuantity;
+                }
+
+                this.generatedUUIDs = [];
+
+                for (let i = 0; i < clampedQuantity; i++) {
+                    let uuid;
+                    if (this.currentVersion === 4) {
+                        uuid = this.generateUUIDv4();
+                    } else {
+                        uuid = this.generateUUIDv1();
+                    }
+
+                    const formattedUUID = this.formatUUID(uuid);
+                    this.generatedUUIDs.push(formattedUUID);
+                    this.addToHistory(formattedUUID);
+                }
+
+                this.displayResults();
+                this.updateHistory();
+                this.saveHistory();
+                this.showNotification(`Generated ${clampedQuantity} UUID${clampedQuantity > 1 ? 's' : ''}!`);
+            }
+
+            generateUUIDv4() {
+                // RFC 4122 compliant UUID v4 generation
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            generateUUIDv1() {
+                // Simplified UUID v1 generation (timestamp-based)
+                const timestamp = Date.now();
+                const timeHex = timestamp.toString(16).padStart(12, '0');
+                const random = Math.random().toString(16).substring(2, 14);
+                
+                return `${timeHex.substring(0, 8)}-${timeHex.substring(8, 12)}-1${random.substring(0, 3)}-${random.substring(3, 7)}-${random.substring(7, 19)}`;
+            }
+
+            formatUUID(uuid) {
+                let formatted = uuid;
+
+                // Remove hyphens if not wanted
+                if (!document.getElementById('includeHyphens').checked) {
+                    formatted = formatted.replace(/-/g, '');
+                }
+
+                // Convert to uppercase if requested
+                if (document.getElementById('uppercase').checked) {
+                    formatted = formatted.toUpperCase();
+                }
+
+                // Add braces if requested
+                if (document.getElementById('includeBraces').checked) {
+                    formatted = `{${formatted}}`;
+                }
+
+                return formatted;
+            }
+
+            displayResults() {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContainer = document.getElementById('uuidResults');
+                
+                resultsContainer.innerHTML = '';
+
+                this.generatedUUIDs.forEach((uuid, index) => {
+                    const uuidElement = this.createUUIDElement(uuid, index);
+                    resultsContainer.appendChild(uuidElement);
+                });
+
+                resultsSection.classList.add('show');
+
+                // Show/hide bulk action buttons
+                const showBulkActions = this.generatedUUIDs.length > 1;
+                document.getElementById('copyAllBtn').style.display = showBulkActions ? 'flex' : 'none';
+                document.getElementById('exportBtn').style.display = showBulkActions ? 'flex' : 'none';
+            }
+
+            createUUIDElement(uuid, index) {
+                const container = document.createElement('div');
+                container.className = 'current-uuid';
+                
+                container.innerHTML = `
+                    <div class="uuid-display">
+                        <div class="uuid-text">${this.escapeHtml(uuid)}</div>
+                        <button class="copy-button" onclick="uuidTool.copyUUID('${this.escapeHtml(uuid)}', ${index})">📋 Copy</button>
+                    </div>
+                    <div class="uuid-info">
+                        <div class="info-item">
+                            <div class="info-label">Version</div>
+                            <div class="info-value">v${this.currentVersion}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Length</div>
+                            <div class="info-value">${uuid.length} chars</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Format</div>
+                            <div class="info-value">${this.getFormatDescription()}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Generated</div>
+                            <div class="info-value">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                `;
+
+                return container;
+            }
+
+            getFormatDescription() {
+                const parts = [];
+                if (document.getElementById('includeHyphens').checked) parts.push('Hyphens');
+                if (document.getElementById('uppercase').checked) parts.push('Uppercase');
+                if (document.getElementById('includeBraces').checked) parts.push('Braces');
+                return parts.length > 0 ? parts.join(', ') : 'Standard';
+            }
+
+            async copyUUID(uuid, index) {
+                try {
+                    await navigator.clipboard.writeText(uuid);
+                    this.showNotification(`UUID ${index + 1} copied to clipboard!`);
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = uuid;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showNotification(`UUID ${index + 1} copied to clipboard!`);
+                }
+            }
+
+            async copyAllUUIDs() {
+                const allUUIDs = this.generatedUUIDs.join('\n');
+                try {
+                    await navigator.clipboard.writeText(allUUIDs);
+                    this.showNotification(`All ${this.generatedUUIDs.length} UUIDs copied to clipboard!`);
+                } catch (err) {
+                    this.showNotification('Failed to copy UUIDs', 'error');
+                }
+            }
+
+            exportUUIDs() {
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+                let content = `UUID Export - ${new Date().toLocaleString()}\n`;
+                content += `Generated ${this.generatedUUIDs.length} UUIDs (Version ${this.currentVersion})\n\n`;
+                content += this.generatedUUIDs.join('\n');
+
+                this.downloadFile(content, `uuids-${timestamp}.txt`, 'text/plain');
+                this.showNotification('UUIDs exported successfully!');
+            }
+
+            addToHistory(uuid) {
+                const historyItem = {
+                    uuid: uuid,
+                    version: this.currentVersion,
+                    timestamp: Date.now()
+                };
+
+                this.history.unshift(historyItem);
+                this.history = this.history.slice(0, 50); // Keep only last 50
+            }
+
+            updateHistory() {
+                const historyList = document.getElementById('historyList');
+                const historyCount = document.getElementById('historyCount');
+
+                historyCount.textContent = this.history.length;
+
+                if (this.history.length === 0) {
+                    historyList.innerHTML = '<div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">No UUIDs generated yet</div>';
+                    return;
+                }
+
+                historyList.innerHTML = '';
+                this.history.slice(0, 20).forEach((item, index) => {
+                    const historyElement = document.createElement('div');
+                    historyElement.className = 'history-item';
+                    historyElement.innerHTML = `
+                        <div class="history-uuid">${this.escapeHtml(item.uuid)}</div>
+                        <div class="history-actions">
+                            <button class="btn btn-success btn-small" onclick="uuidTool.copyUUID('${this.escapeHtml(item.uuid)}', 'history')">Copy</button>
+                            <button class="btn btn-secondary btn-small" onclick="uuidTool.removeFromHistory(${index})">Remove</button>
+                        </div>
+                    `;
+                    historyList.appendChild(historyElement);
+                });
+            }
+
+            removeFromHistory(index) {
+                this.history.splice(index, 1);
+                this.updateHistory();
+                this.saveHistory();
+                this.showNotification('UUID removed from history');
+            }
+
+            validateUUID() {
+                const input = document.getElementById('validationInput').value.trim();
+                const result = document.getElementById('validationResult');
+
+                if (!input) {
+                    result.style.display = 'none';
+                    return;
+                }
+
+                const isValid = this.isValidUUID(input);
+                
+                if (isValid) {
+                    const version = this.getUUIDVersion(input);
+                    result.className = 'validation-result valid';
+                    result.textContent = `✅ Valid UUID (Version ${version})`;
+                } else {
+                    result.className = 'validation-result invalid';
+                    result.textContent = '❌ Invalid UUID format';
+                }
+
+                result.style.display = 'block';
+            }
+
+            isValidUUID(uuid) {
+                // Remove braces if present
+                const cleaned = uuid.replace(/[{}]/g, '');
+                
+                // UUID with hyphens
+                const withHyphens = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+                // UUID without hyphens
+                const withoutHyphens = /^[0-9a-f]{32}$/i;
+
+                return withHyphens.test(cleaned) || withoutHyphens.test(cleaned);
+            }
+
+            getUUIDVersion(uuid) {
+                const cleaned = uuid.replace(/[{}-]/g, '');
+                if (cleaned.length === 32) {
+                    return parseInt(cleaned[12], 16);
+                }
+                return 'Unknown';
+            }
+
+            clearValidation() {
+                document.getElementById('validationInput').value = '';
+                document.getElementById('validationResult').style.display = 'none';
+            }
+
+            clearAll() {
+                this.generatedUUIDs = [];
+                this.history = [];
+                
+                document.getElementById('resultsSection').classList.remove('show');
+                document.getElementById('quantityInput').value = 1;
+                
+                // Reset format options
+                document.getElementById('includeHyphens').checked = true;
+                document.getElementById('uppercase').checked = false;
+                document.getElementById('includeBraces').checked = false;
+                
+                // Reset version to v4
+                document.querySelectorAll('.version-option').forEach(opt => opt.classList.remove('active'));
+                document.querySelector('[data-version="4"]').classList.add('active');
+                this.currentVersion = 4;
+
+                this.updateHistory();
+                this.saveHistory();
+                this.showNotification('All data cleared!');
+            }
+
+            switchTab(tabName) {
+                // Update tab buttons
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                event.target.classList.add('active');
+
+                // Update tab content
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
+
+            saveHistory() {
+                try {
+                    localStorage.setItem('uuidHistory', JSON.stringify(this.history));
+                } catch (error) {
+                    console.log('Could not save history to localStorage');
+                }
+            }
+
+            loadHistory() {
+                try {
+                    const saved = localStorage.getItem('uuidHistory');
+                    if (saved) {
+                        this.history = JSON.parse(saved);
+                        this.updateHistory();
+                    }
+                } catch (error) {
+                    console.log('Could not load history from localStorage');
+                }
+            }
+
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the UUID tool
+        let uuidTool;
+        document.addEventListener('DOMContentLoaded', () => {
+            uuidTool = new UUIDTool();
+        });
+    </script>
+</body>
+</html>
