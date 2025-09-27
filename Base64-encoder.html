@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 Encoder/Decoder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .encoder-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .mode-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .mode-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .mode-option {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .mode-option.active {
+            background: #1976d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 1.5em;
+        }
+
+        .mode-label {
+            font-size: 1.1em;
+        }
+
+        .mode-description {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .option-item:hover {
+            border-color: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1976d2;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .option-checkbox.checked {
+            background: #1976d2;
+        }
+
+        .option-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .option-label {
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 250px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            line-height: 1.5;
+        }
+
+        .text-area::placeholder {
+            color: #999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-encode {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-encode:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-decode {
+            background: linear-gradient(45deg, #ff9800, #ffb74d);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-decode:hover {
+            background: linear-gradient(45deg, #f57c00, #ff9800);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .analysis-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .analysis-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .analysis-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .analysis-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .info-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .info-content {
+            color: #666;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            text-align: center;
+        }
+
+        .info-item-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .info-item-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .error-section {
+            background: #ffebee;
+            border: 2px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .error-title {
+            color: #c62828;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffcdd2;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .success-message, .error-alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-alert {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .encoder-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .options-grid {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-stats {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .mode-toggle {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .mode-option {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .encoder-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .text-area {
+                min-height: 200px;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .option-item {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="encoder-container">
+        <div class="header">
+            <h1>🔐 Base64 Encoder/Decoder</h1>
+            <p>Convert text to Base64 and decode Base64 back to text</p>
+        </div>
+
+        <div class="mode-section">
+            <div class="mode-title">
+                ⚙️ Processing Mode
+            </div>
+            <div class="mode-toggle">
+                <div class="mode-option active" onclick="selectMode('encode')" data-mode="encode">
+                    <div class="mode-icon">🔒</div>
+                    <div class="mode-label">Encode</div>
+                    <div class="mode-description">Convert text to Base64</div>
+                </div>
+                <div class="mode-option" onclick="selectMode('decode')" data-mode="decode">
+                    <div class="mode-icon">🔓</div>
+                    <div class="mode-label">Decode</div>
+                    <div class="mode-description">Convert Base64 to text</div>
+                </div>
+            </div>
+
+            <div class="options-grid">
+                <div class="option-item" onclick="toggleOption('autoProcess')">
+                    <div class="option-checkbox checked" id="autoProcess"></div>
+                    <label class="option-label">Auto Process</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('urlSafe')">
+                    <div class="option-checkbox" id="urlSafe"></div>
+                    <label class="option-label">URL Safe Base64</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('removePadding')">
+                    <div class="option-checkbox" id="removePadding"></div>
+                    <label class="option-label">Remove Padding</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    📝 <span id="inputLabel">Plain Text Input</span>
+                </div>
+                <textarea 
+                    class="text-area" 
+                    id="inputText" 
+                    placeholder="Enter text to encode..."
+                    oninput="updateInputStats(); autoProcess();"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📝</span>
+                        <span id="inputChars">0 characters</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputLines">0 lines</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    📤 <span id="outputLabel">Base64 Output</span>
+                </div>
+                <div class="output-area">
+                    <textarea 
+                        class="text-area" 
+                        id="outputText" 
+                        placeholder="Processed output will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📈</span>
+                        <span id="sizeChange">No change</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-section" id="errorSection">
+            <div class="error-title">
+                ❌ Processing Error
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-encode" id="encodeBtn" onclick="encodeText()">
+                🔒 Encode to Base64
+            </button>
+            <button class="action-btn btn-decode" id="decodeBtn" onclick="decodeText()">
+                🔓 Decode from Base64
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-primary" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="analysis-section" id="analysisSection" style="display: none;">
+            <div class="analysis-title">
+                📊 Processing Analysis
+            </div>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-value" id="originalLength">0</div>
+                    <div class="analysis-label">Input Length</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="processedLength">0</div>
+                    <div class="analysis-label">Output Length</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="sizeRatio">0%</div>
+                    <div class="analysis-label">Size Change</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-value" id="processingTime">0ms</div>
+                    <div class="analysis-label">Processing Time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="info-title">📚 Base64 Information</div>
+            <div class="info-content">
+                Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation.
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-item-title">Standard Base64</div>
+                    <div class="info-item-description">Uses A-Z, a-z, 0-9, +, / with = padding</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">URL Safe Base64</div>
+                    <div class="info-item-description">Uses A-Z, a-z, 0-9, -, _ safe for URLs</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Size Increase</div>
+                    <div class="info-item-description">Encoded data is ~33% larger than original</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Common Uses</div>
+                    <div class="info-item-description">Email attachments, web data transfer, APIs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">🛠️ Tool Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Real-time encoding and decoding</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-text">URL safe Base64 support</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed size analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-text">Error handling and validation</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">Processing completed successfully!</div>
+        <div class="error-alert" id="errorAlert">Please enter some text to process.</div>
+    </div>
+
+    <script>
+        let currentMode = 'encode';
+        let options = {
+            autoProcess: true,
+            urlSafe: false,
+            removePadding: false
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            updateLabels();
+            
+            // Add entrance animation
+            document.querySelector('.encoder-container').style.opacity = '0';
+            document.querySelector('.encoder-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.encoder-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.encoder-container').style.opacity = '1';
+                document.querySelector('.encoder-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputText').focus();
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'e':
+                            e.preventDefault();
+                            encodeText();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            decodeText();
+                            break;
+                        case 'c':
+                            if (e.shiftKey) {
+                                e.preventDefault();
+                                copyOutput();
+                            }
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+            });
+        });
+
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Update active mode
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+            // Update labels and placeholders
+            updateLabels();
+
+            // Auto-process if enabled and there's content
+            autoProcess();
+        }
+
+        function updateLabels() {
+            const inputLabel = document.getElementById('inputLabel');
+            const outputLabel = document.getElementById('outputLabel');
+            const inputText = document.getElementById('inputText');
+            const encodeBtn = document.getElementById('encodeBtn');
+            const decodeBtn = document.getElementById('decodeBtn');
+
+            if (currentMode === 'encode') {
+                inputLabel.textContent = 'Plain Text Input';
+                outputLabel.textContent = 'Base64 Output';
+                inputText.placeholder = 'Enter text to encode...';
+                encodeBtn.style.display = 'flex';
+                decodeBtn.style.display = 'none';
+            } else {
+                inputLabel.textContent = 'Base64 Input';
+                outputLabel.textContent = 'Plain Text Output';
+                inputText.placeholder = 'Enter Base64 to decode...';
+                encodeBtn.style.display = 'none';
+                decodeBtn.style.display = 'flex';
+            }
+        }
+
+        function toggleOption(optionName) {
+            options[optionName] = !options[optionName];
+            const checkbox = document.getElementById(optionName);
+            
+            if (options[optionName]) {
+                checkbox.classList.add('checked');
+            } else {
+                checkbox.classList.remove('checked');
+            }
+
+            // Auto-process if there's content
+            autoProcess();
+        }
+
+        function updateInputStats() {
+            const inputText = document.getElementById('inputText').value;
+            const size = new Blob([inputText]).size;
+            const chars = inputText.length;
+            const lines = inputText ? inputText.split('\n').length : 0;
+
+            document.getElementById('inputSize').textContent = `${size} bytes`;
+            document.getElementById('inputChars').textContent = `${chars} characters`;
+            document.getElementById('inputLines').textContent = `${lines} lines`;
+        }
+
+        function autoProcess() {
+            if (options.autoProcess && document.getElementById('inputText').value.trim()) {
+                if (currentMode === 'encode') {
+                    encodeText();
+                } else {
+                    decodeText();
+                }
+            }
+        }
+
+        function encodeText() {
+            const inputText = document.getElementById('inputText').value;
+            
+            if (!inputText.trim()) {
+                showError('Please enter some text to encode.');
+                return;
+            }
+
+            const startTime = performance.now();
+
+            try {
+                let encoded = btoa(unescape(encodeURIComponent(inputText)));
+                
+                // Apply URL safe encoding if enabled
+                if (options.urlSafe) {
+                    encoded = encoded.replace(/\+/g, '-').replace(/\//g, '_');
+                }
+                
+                // Remove padding if enabled
+                if (options.removePadding) {
+                    encoded = encoded.replace(/=+$/, '');
+                }
+
+                const endTime = performance.now();
+                displayResult(inputText, encoded, 'Encoded', endTime - startTime);
+                showSuccess('Text encoded to Base64 successfully!');
+
+            } catch (error) {
+                showError('Encoding failed: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function decodeText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showError('Please enter some Base64 to decode.');
+                return;
+            }
+
+            const startTime = performance.now();
+
+            try {
+                let toDecode = inputText;
+                
+                // Handle URL safe Base64
+                if (options.urlSafe || toDecode.includes('-') || toDecode.includes('_')) {
+                    toDecode = toDecode.replace(/-/g, '+').replace(/_/g, '/');
+                }
+                
+                // Add padding if needed
+                while (toDecode.length % 4) {
+                    toDecode += '=';
+                }
+
+                const decoded = decodeURIComponent(escape(atob(toDecode)));
+                const endTime = performance.now();
+                
+                displayResult(inputText, decoded, 'Decoded', endTime - startTime);
+                showSuccess('Base64 decoded to text successfully!');
+
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 
+                    'Invalid Base64 input. Please check your data and try again.\n\nError: ' + error.message;
+                document.getElementById('errorSection').style.display = 'block';
+                document.getElementById('analysisSection').style.display = 'none';
+                showError('Decoding failed. Please check your Base64 input.');
+            }
+        }
+
+        function displayResult(originalText, processedText, operation, processingTime) {
+            document.getElementById('outputText').value = processedText;
+            document.getElementById('errorSection').style.display = 'none';
+            
+            // Calculate statistics
+            const originalSize = new Blob([originalText]).size;
+            const processedSize = new Blob([processedText]).size;
+            const sizeChange = originalSize > 0 ? Math.round(((processedSize - originalSize) / originalSize) * 100) : 0;
+
+            // Update output stats
+            document.getElementById('outputSize').textContent = `${processedSize} bytes`;
+            document.getElementById('sizeChange').textContent = 
+                sizeChange > 0 ? `+${sizeChange}% larger` : 
+                sizeChange < 0 ? `${Math.abs(sizeChange)}% smaller` : 'No change';
+
+            // Update analysis
+            document.getElementById('originalLength').textContent = originalSize.toLocaleString();
+            document.getElementById('processedLength').textContent = processedSize.toLocaleString();
+            document.getElementById('sizeRatio').textContent = sizeChange + '%';
+            document.getElementById('processingTime').textContent = Math.round(processingTime) + 'ms';
+
+            // Show analysis section
+            document.getElementById('analysisSection').style.display = 'block';
+
+            // Enable copy button
+            document.getElementById('copyBtn').classList.remove('btn-disabled');
+        }
+
+        async function copyOutput() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (!outputText.trim()) {
+                showError('No output to copy. Please process some text first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText);
+                showSuccess('Output copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showSuccess('Output copied to clipboard!');
+                } catch (fallbackErr) {
+                    showError('Failed to copy. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('errorSection').style.display = 'none';
+            document.getElementById('analysisSection').style.display = 'none';
+            
+            updateInputStats();
+            document.getElementById('outputSize').textContent = '0 bytes';
+            document.getElementById('sizeChange').textContent = 'No change';
+            
+            showSuccess('All content cleared!');
+            document.getElementById('inputText').focus();
+        }
+
+        function loadSample() {
+            const samples = {
+                encode: {
+                    text: `Hello, World! This is a sample text for Base64 encoding.
+
+It includes multiple lines, special characters (!@#$%^&*), 
+numbers (12345), and Unicode characters (🔐💻📊).
+
+Base64 encoding is commonly used for:
+- Email attachments
+- Web APIs
+- Data transmission
+- Image embedding in HTML/CSS`,
+                    description: 'Sample text for encoding'
+                },
+                decode: {
+                    text: 'SGVsbG8sIFdvcmxkISBUaGlzIGlzIGEgc2FtcGxlIEJhc2U2NCBlbmNvZGVkIHN0cmluZy4KCkl0IGluY2x1ZGVzIG11bHRpcGxlIGxpbmVzLCBzcGVjaWFsIGNoYXJhY3RlcnMsIGFuZCBVbmljb2RlLgoKRGVjb2RpbmcgdGhpcyB3aWxsIHJldmVhbCB0aGUgb3JpZ2luYWwgdGV4dC4=',
+                    description: 'Sample Base64 for decoding'
+                }
+            };
+
+            const sample = samples[currentMode];
+            document.getElementById('inputText').value = sample.text;
+            updateInputStats();
+            
+            if (options.autoProcess) {
+                autoProcess();
+            }
+            
+            showSuccess(`${sample.description} loaded!`);
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorAlert');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
