@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Tag Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .results-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .section-title {
+            color: #007bff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .url-input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .url-input-section:focus-within {
+            border-color: #007bff;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .url-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #urlInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        #urlInput:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .demo-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .demo-urls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .demo-url {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .demo-url:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #007bff;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .analysis-results {
+            display: none;
+        }
+
+        .analysis-results.show {
+            display: block;
+        }
+
+        .page-info {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .page-url {
+            font-family: 'Courier New', monospace;
+            color: #6c757d;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .meta-tag-grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-tag-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .meta-tag-item:hover {
+            border-color: #007bff;
+        }
+
+        .meta-tag-item.warning {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .meta-tag-item.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .meta-tag-item.success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .meta-tag-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .meta-tag-name {
+            font-weight: 600;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .meta-tag-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .status-error {
+            background: #dc3545;
+            color: white;
+        }
+
+        .meta-tag-content {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .meta-content-text {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .meta-tag-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .suggestions {
+            background: #e3f2fd;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .suggestions-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-list {
+            list-style: none;
+        }
+
+        .suggestion-list li {
+            color: #0056b3;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .suggestion-list li::before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .source-viewer {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #007bff;
+            flex: 1;
+        }
+
+        .source-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+        }
+
+        .source-code {
+            background: #1e1e1e;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .source-code pre {
+            color: #f8f8f2;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .html-tag {
+            color: #f92672;
+        }
+
+        .html-attr {
+            color: #66d9ef;
+        }
+
+        .html-value {
+            color: #a6e22e;
+        }
+
+        .summary-stats {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-stat {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .summary-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .summary-stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .export-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .cors-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cors-notice-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .cors-notice-text {
+            color: #856404;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .url-input-container {
+                flex-direction: column;
+            }
+
+            .meta-tag-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .meta-tag-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .export-actions {
+                flex-direction: column;
+            }
+
+            .source-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-panel,
+            .results-panel {
+                padding: 20px;
+            }
+
+            .meta-tag-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Meta Tag Analyzer</h1>
+            <p>Analyze webpage meta tags for SEO optimization and best practices compliance</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-panel">
+                <div class="section-title">URL Analysis</div>
+                
+                <div class="cors-notice">
+                    <div class="cors-notice-title">⚠️ Browser Limitation Notice</div>
+                    <div class="cors-notice-text">
+                        Due to CORS restrictions, this tool cannot directly fetch external websites. 
+                        Use the demo examples below or implement server-side functionality for full analysis.
+                    </div>
+                </div>
+
+                <div class="url-input-section">
+                    <label class="input-label">🌐 Website URL</label>
+                    <div class="url-input-container">
+                        <input type="url" id="urlInput" placeholder="https://example.com" value="">
+                    </div>
+                </div>
+
+                <div class="demo-section">
+                    <div class="demo-title">📋 Demo Examples</div>
+                    <div class="demo-urls">
+                        <div class="demo-url" data-demo="ecommerce">E-commerce Site (Good SEO)</div>
+                        <div class="demo-url" data-demo="blog">Blog Article (Needs Improvement)</div>
+                        <div class="demo-url" data-demo="corporate">Corporate Website (Poor SEO)</div>
+                        <div class="demo-url" data-demo="news">News Article (Excellent SEO)</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="analyzeBtn">
+                        <span>🔍</span> Analyze Meta Tags
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> Clear Results
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Analyzing meta tags...</div>
+                </div>
+
+                <div class="analysis-results" id="analysisResults">
+                    <div class="section-title">Analysis Results</div>
+                    
+                    <div class="page-info" id="pageInfo">
+                        <div class="page-title" id="pageTitle">Page Title</div>
+                        <div class="page-url" id="pageUrl">https://example.com</div>
+                    </div>
+
+                    <div class="summary-stats">
+                        <div class="section-title">SEO Score Overview</div>
+                        <div class="stats-grid">
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" id="overallScore">0</div>
+                                <div class="summary-stat-label">Overall Score</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" id="passedChecks">0</div>
+                                <div class="summary-stat-label">Passed Checks</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" id="warningChecks">0</div>
+                                <div class="summary-stat-label">Warnings</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" id="errorChecks">0</div>
+                                <div class="summary-stat-label">Errors</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meta-tag-grid" id="metaTagGrid">
+                        <!-- Meta tag analysis results will be populated here -->
+                    </div>
+
+                    <div class="source-viewer">
+                        <div class="source-header">
+                            <div class="source-title">📄 HTML Source</div>
+                            <div class="source-actions">
+                                <button class="btn btn-success btn-small" id="copySourceBtn">Copy</button>
+                                <button class="btn btn-secondary btn-small" id="downloadSourceBtn">Download</button>
+                            </div>
+                        </div>
+                        <div class="source-code">
+                            <pre id="sourceCode"><!-- Meta tags will appear here --></pre>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <div class="export-title">📤 Export Results</div>
+                        <div class="export-actions">
+                            <button class="btn btn-success" id="exportReportBtn">
+                                <span>📊</span> Export Report
+                            </button>
+                            <button class="btn btn-success" id="exportJsonBtn">
+                                <span>📄</span> Export JSON
+                            </button>
+                            <button class="btn btn-success" id="exportCsvBtn">
+                                <span>📋</span> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        Analysis completed successfully!
+    </div>
+
+    <script>
+        class MetaTagAnalyzer {
+            constructor() {
+                this.currentAnalysis = null;
+                this.demoData = this.generateDemoData();
+                
+                this.initEventListeners();
+            }
+
+            initEventListeners() {
+                // Analyze button
+                document.getElementById('analyzeBtn').addEventListener('click', () => {
+                    this.analyzeUrl();
+                });
+
+                // Clear button
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearResults();
+                });
+
+                // Demo buttons
+                document.querySelectorAll('.demo-url').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.loadDemo(e.target.dataset.demo);
+                    });
+                });
+
+                // Export buttons
+                document.getElementById('copySourceBtn').addEventListener('click', () => {
+                    this.copySource();
+                });
+
+                document.getElementById('downloadSourceBtn').addEventListener('click', () => {
+                    this.downloadSource();
+                });
+
+                document.getElementById('exportReportBtn').addEventListener('click', () => {
+                    this.exportReport();
+                });
+
+                document.getElementById('exportJsonBtn').addEventListener('click', () => {
+                    this.exportJson();
+                });
+
+                document.getElementById('exportCsvBtn').addEventListener('click', () => {
+                    this.exportCsv();
+                });
+
+                // URL input validation
+                document.getElementById('urlInput').addEventListener('input', (e) => {
+                    this.validateUrl(e.target.value);
+                });
+            }
+
+            generateDemoData() {
+                return {
+                    ecommerce: {
+                        url: 'https://example-shop.com/product/wireless-headphones',
+                        title: 'Wireless Bluetooth Headphones - Premium Sound Quality | ExampleShop',
+                        metaTags: {
+                            title: {
+                                content: 'Wireless Bluetooth Headphones - Premium Sound Quality | ExampleShop',
+                                length: 71
+                            },
+                            description: {
+                                content: 'Discover our premium wireless Bluetooth headphones with noise cancellation, 30-hour battery life, and crystal-clear sound. Free shipping on orders over $50.',
+                                length: 157
+                            },
+                            keywords: {
+                                content: 'wireless headphones, bluetooth headphones, noise cancellation, premium audio',
+                                length: 84
+                            },
+                            viewport: {
+                                content: 'width=device-width, initial-scale=1.0',
+                                length: 37
+                            },
+                            'og:title': {
+                                content: 'Wireless Bluetooth Headphones - Premium Sound',
+                                length: 46
+                            },
+                            'og:description': {
+                                content: 'Premium wireless headphones with advanced noise cancellation and 30-hour battery life.',
+                                length: 95
+                            },
+                            'og:image': {
+                                content: 'https://example-shop.com/images/headphones-hero.jpg',
+                                length: 54
+                            },
+                            'twitter:card': {
+                                content: 'summary_large_image',
+                                length: 19
+                            }
+                        }
+                    },
+                    blog: {
+                        url: 'https://myblog.com/how-to-improve-seo',
+                        title: 'How to Improve SEO',
+                        metaTags: {
+                            title: {
+                                content: 'How to Improve SEO',
+                                length: 18
+                            },
+                            description: {
+                                content: 'Learn SEO tips',
+                                length: 14
+                            },
+                            viewport: {
+                                content: 'width=device-width, initial-scale=1.0',
+                                length: 37
+                            }
+                        }
+                    },
+                    corporate: {
+                        url: 'https://corporatesite.com',
+                        title: 'Home',
+                        metaTags: {
+                            title: {
+                                content: 'Home',
+                                length: 4
+                            }
+                        }
+                    },
+                    news: {
+                        url: 'https://newssite.com/breaking-tech-innovation-2024',
+                        title: 'Breaking: Revolutionary AI Technology Announced for 2024 | TechNews Daily',
+                        metaTags: {
+                            title: {
+                                content: 'Breaking: Revolutionary AI Technology Announced for 2024 | TechNews Daily',
+                                length: 72
+                            },
+                            description: {
+                                content: 'Major tech company unveils groundbreaking artificial intelligence platform that promises to transform how businesses operate. Read the full story with expert analysis.',
+                                length: 159
+                            },
+                            keywords: {
+                                content: 'AI technology, artificial intelligence, tech news, innovation, 2024, business transformation',
+                                length: 95
+                            },
+                            viewport: {
+                                content: 'width=device-width, initial-scale=1.0',
+                                length: 37
+                            },
+                            'og:title': {
+                                content: 'Revolutionary AI Technology Announced for 2024',
+                                length: 46
+                            },
+                            'og:description': {
+                                content: 'Major breakthrough in AI technology promises to transform business operations worldwide.',
+                                length: 93
+                            },
+                            'og:image': {
+                                content: 'https://newssite.com/images/ai-tech-2024.jpg',
+                                length: 44
+                            },
+                            'og:type': {
+                                content: 'article',
+                                length: 7
+                            },
+                            'twitter:card': {
+                                content: 'summary_large_image',
+                                length: 19
+                            },
+                            'twitter:site': {
+                                content: '@technewsdaily',
+                                length: 14
+                            },
+                            author: {
+                                content: 'Sarah Johnson',
+                                length: 12
+                            },
+                            'article:published_time': {
+                                content: '2024-01-15T10:30:00Z',
+                                length: 20
+                            }
+                        }
+                    }
+                };
+            }
+
+            validateUrl(url) {
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                try {
+                    new URL(url);
+                    analyzeBtn.disabled = false;
+                    return true;
+                } catch {
+                    analyzeBtn.disabled = !url.startsWith('demo:');
+                    return false;
+                }
+            }
+
+            async analyzeUrl() {
+                const url = document.getElementById('urlInput').value.trim();
+                
+                if (!url) {
+                    this.showNotification('Please enter a URL to analyze', 'error');
+                    return;
+                }
+
+                this.showLoading();
+
+                // Simulate API call delay
+                setTimeout(() => {
+                    if (url.startsWith('demo:')) {
+                        const demoType = url.replace('demo:', '');
+                        this.analyzeDemo(demoType);
+                    } else {
+                        this.simulateAnalysis(url);
+                    }
+                }, 1500);
+            }
+
+            loadDemo(demoType) {
+                document.getElementById('urlInput').value = `demo:${demoType}`;
+                this.analyzeDemo(demoType);
+            }
+
+            analyzeDemo(demoType) {
+                const demoData = this.demoData[demoType];
+                if (!demoData) {
+                    this.showNotification('Demo data not found', 'error');
+                    this.hideLoading();
+                    return;
+                }
+
+                this.currentAnalysis = this.performAnalysis(demoData);
+                this.displayResults();
+                this.hideLoading();
+                this.showNotification('Demo analysis completed!');
+            }
+
+            simulateAnalysis(url) {
+                // Simulate a basic analysis for any URL
+                const simulatedData = {
+                    url: url,
+                    title: 'Unable to fetch due to CORS restrictions',
+                    metaTags: {
+                        title: {
+                            content: 'CORS restriction prevents fetching',
+                            length: 34
+                        },
+                        description: {
+                            content: 'This tool cannot fetch external URLs due to browser security restrictions',
+                            length: 74
+                        }
+                    }
+                };
+
+                this.currentAnalysis = this.performAnalysis(simulatedData);
+                this.displayResults();
+                this.hideLoading();
+                this.showNotification('Simulated analysis completed (CORS limited)', 'warning');
+            }
+
+            performAnalysis(data) {
+                const analysis = {
+                    url: data.url,
+                    title: data.title,
+                    metaTags: {},
+                    score: 0,
+                    passed: 0,
+                    warnings: 0,
+                    errors: 0
+                };
+
+                // Analyze each meta tag
+                Object.entries(data.metaTags).forEach(([name, tag]) => {
+                    const tagAnalysis = this.analyzeMetaTag(name, tag);
+                    analysis.metaTags[name] = tagAnalysis;
+
+                    // Update counters
+                    if (tagAnalysis.status === 'success') analysis.passed++;
+                    else if (tagAnalysis.status === 'warning') analysis.warnings++;
+                    else if (tagAnalysis.status === 'error') analysis.errors++;
+                });
+
+                // Calculate overall score
+                const totalChecks = analysis.passed + analysis.warnings + analysis.errors;
+                analysis.score = totalChecks > 0 ? Math.round((analysis.passed / totalChecks) * 100) : 0;
+
+                return analysis;
+            }
+
+            analyzeMetaTag(name, tag) {
+                const analysis = {
+                    name: name,
+                    content: tag.content,
+                    length: tag.length,
+                    status: 'success',
+                    suggestions: []
+                };
+
+                // Analyze based on tag type
+                switch (name) {
+                    case 'title':
+                        if (!tag.content) {
+                            analysis.status = 'error';
+                            analysis.suggestions.push('Title tag is missing');
+                        } else if (tag.length < 30) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('Title is too short (recommended: 30-60 characters)');
+                        } else if (tag.length > 60) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('Title is too long (recommended: 30-60 characters)');
+                        }
+                        break;
+
+                    case 'description':
+                        if (!tag.content) {
+                            analysis.status = 'error';
+                            analysis.suggestions.push('Meta description is missing');
+                        } else if (tag.length < 120) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('Description is too short (recommended: 120-160 characters)');
+                        } else if (tag.length > 160) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('Description is too long (recommended: 120-160 characters)');
+                        }
+                        break;
+
+                    case 'keywords':
+                        if (tag.content) {
+                            const keywordCount = tag.content.split(',').length;
+                            if (keywordCount > 10) {
+                                analysis.status = 'warning';
+                                analysis.suggestions.push('Too many keywords (recommended: 5-10 keywords)');
+                            }
+                        }
+                        break;
+
+                    case 'viewport':
+                        if (!tag.content.includes('width=device-width')) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('Should include width=device-width for mobile optimization');
+                        }
+                        break;
+
+                    case 'og:title':
+                        if (tag.length > 95) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('OpenGraph title too long (recommended: <95 characters)');
+                        }
+                        break;
+
+                    case 'og:description':
+                        if (tag.length > 200) {
+                            analysis.status = 'warning';
+                            analysis.suggestions.push('OpenGraph description too long (recommended: <200 characters)');
+                        }
+                        break;
+                }
+
+                // Add general suggestions for empty content
+                if (!tag.content && analysis.suggestions.length === 0) {
+                    analysis.suggestions.push('Consider adding content to this meta tag');
+                }
+
+                return analysis;
+            }
+
+            displayResults() {
+                if (!this.currentAnalysis) return;
+
+                // Update page info
+                document.getElementById('pageTitle').textContent = this.currentAnalysis.title;
+                document.getElementById('pageUrl').textContent = this.currentAnalysis.url;
+
+                // Update summary stats
+                document.getElementById('overallScore').textContent = `${this.currentAnalysis.score}%`;
+                document.getElementById('passedChecks').textContent = this.currentAnalysis.passed;
+                document.getElementById('warningChecks').textContent = this.currentAnalysis.warnings;
+                document.getElementById('errorChecks').textContent = this.currentAnalysis.errors;
+
+                // Display meta tags
+                this.displayMetaTags();
+
+                // Generate source code
+                this.generateSourceCode();
+
+                // Show results
+                document.getElementById('analysisResults').classList.add('show');
+            }
+
+            displayMetaTags() {
+                const grid = document.getElementById('metaTagGrid');
+                grid.innerHTML = '';
+
+                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
+                    const item = document.createElement('div');
+                    item.className = `meta-tag-item ${analysis.status}`;
+                    
+                    item.innerHTML = `
+                        <div class="meta-tag-header">
+                            <div class="meta-tag-name">${this.escapeHtml(name)}</div>
+                            <div class="meta-tag-status status-${analysis.status}">
+                                ${analysis.status.toUpperCase()}
+                            </div>
+                        </div>
+                        
+                        <div class="meta-tag-content">
+                            <div class="meta-content-text">${this.escapeHtml(analysis.content || 'No content')}</div>
+                        </div>
+                        
+                        <div class="meta-tag-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${analysis.length}</div>
+                                <div class="stat-label">Characters</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${analysis.content ? analysis.content.split(' ').length : 0}</div>
+                                <div class="stat-label">Words</div>
+                            </div>
+                        </div>
+                        
+                        ${analysis.suggestions.length > 0 ? `
+                            <div class="suggestions">
+                                <div class="suggestions-title">💡 Optimization Suggestions</div>
+                                <ul class="suggestion-list">
+                                    ${analysis.suggestions.map(s => `<li>${this.escapeHtml(s)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    grid.appendChild(item);
+                });
+            }
+
+            generateSourceCode() {
+                if (!this.currentAnalysis) return;
+
+                let html = '';
+                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
+                    if (name === 'title') {
+                        html += `<span class="html-tag">&lt;title&gt;</span>${this.escapeHtml(analysis.content)}<span class="html-tag">&lt;/title&gt;</span>\n`;
+                    } else if (name.startsWith('og:') || name.startsWith('twitter:') || name === 'description' || name === 'keywords') {
+                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">${name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name'}</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(analysis.content)}"</span><span class="html-tag">&gt;</span>\n`;
+                    } else {
+                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">name</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(analysis.content)}"</span><span class="html-tag">&gt;</span>\n`;
+                    }
+                });
+
+                document.getElementById('sourceCode').innerHTML = html;
+            }
+
+            showLoading() {
+                document.getElementById('loading').classList.add('show');
+                document.getElementById('analysisResults').classList.remove('show');
+            }
+
+            hideLoading() {
+                document.getElementById('loading').classList.remove('show');
+            }
+
+            clearResults() {
+                document.getElementById('urlInput').value = '';
+                document.getElementById('analysisResults').classList.remove('show');
+                this.currentAnalysis = null;
+                this.showNotification('Results cleared successfully!');
+            }
+
+            async copySource() {
+                const sourceCode = document.getElementById('sourceCode').textContent;
+                try {
+                    await navigator.clipboard.writeText(sourceCode);
+                    this.showNotification('Source code copied to clipboard!');
+                } catch (err) {
+                    this.showNotification('Failed to copy source code', 'error');
+                }
+            }
+
+            downloadSource() {
+                if (!this.currentAnalysis) return;
+
+                const sourceCode = document.getElementById('sourceCode').textContent;
+                this.downloadFile(sourceCode, 'meta-tags-source.html', 'text/html');
+                this.showNotification('Source code downloaded!');
+            }
+
+            exportReport() {
+                if (!this.currentAnalysis) return;
+
+                let report = `Meta Tag Analysis Report\n`;
+                report += `=======================\n\n`;
+                report += `URL: ${this.currentAnalysis.url}\n`;
+                report += `Title: ${this.currentAnalysis.title}\n`;
+                report += `Analysis Date: ${new Date().toLocaleDateString()}\n\n`;
+                report += `SEO Score: ${this.currentAnalysis.score}%\n`;
+                report += `Passed Checks: ${this.currentAnalysis.passed}\n`;
+                report += `Warnings: ${this.currentAnalysis.warnings}\n`;
+                report += `Errors: ${this.currentAnalysis.errors}\n\n`;
+
+                report += `Meta Tag Analysis:\n`;
+                report += `==================\n\n`;
+
+                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
+                    report += `${name.toUpperCase()}\n`;
+                    report += `Status: ${analysis.status.toUpperCase()}\n`;
+                    report += `Content: ${analysis.content}\n`;
+                    report += `Length: ${analysis.length} characters\n`;
+                    if (analysis.suggestions.length > 0) {
+                        report += `Suggestions: ${analysis.suggestions.join('; ')}\n`;
+                    }
+                    report += `\n`;
+                });
+
+                this.downloadFile(report, 'meta-tag-analysis-report.txt', 'text/plain');
+                this.showNotification('Report exported successfully!');
+            }
+
+            exportJson() {
+                if (!this.currentAnalysis) return;
+
+                const json = JSON.stringify(this.currentAnalysis, null, 2);
+                this.downloadFile(json, 'meta-tag-analysis.json', 'application/json');
+                this.showNotification('JSON data exported successfully!');
+            }
+
+            exportCsv() {
+                if (!this.currentAnalysis) return;
+
+                let csv = 'Meta Tag,Content,Length,Status,Suggestions\n';
+                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
+                    csv += `"${name}","${analysis.content}",${analysis.length},"${analysis.status}","${analysis.suggestions.join('; ')}"\n`;
+                });
+
+                this.downloadFile(csv, 'meta-tag-analysis.csv', 'text/csv');
+                this.showNotification('CSV data exported successfully!');
+            }
+
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the meta tag analyzer
+        document.addEventListener('DOMContentLoaded', () => {
+            new MetaTagAnalyzer();
+        });
+    </script>
+</body>
+</html>
