@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="favicon-16x16.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Minifier Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .minifier-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.1);
+            padding: 40px;
+            max-width: 1400px;
+            width: 100%;
+            border: 2px solid #e3f2fd;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .options-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .options-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .option-item:hover {
+            border-color: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1976d2;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .option-checkbox.checked {
+            background: #1976d2;
+        }
+
+        .option-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .option-label {
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-section, .output-section {
+            background: #f8fbff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.1);
+        }
+
+        .section-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-area {
+            width: 100%;
+            min-height: 350px;
+            border: none;
+            outline: none;
+            font-size: 0.9em;
+            background: transparent;
+            color: #333;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            line-height: 1.4;
+            tab-size: 2;
+        }
+
+        .code-area::placeholder {
+            color: #999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e3f2fd;
+            font-size: 0.9em;
+            color: #666;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #1565c0, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fbff;
+            color: #1976d2;
+            border: 2px solid #e3f2fd;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .stats-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.15);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 25px;
+        }
+
+        .comparison-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .comparison-item {
+            background: #f8fbff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .comparison-label {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .comparison-code {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e3f2fd;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            color: #333;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .processing-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 3px solid #e3f2fd;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e3f2fd;
+            margin-bottom: 20px;
+        }
+
+        .features-title {
+            color: #1976d2;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #1976d2;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .success-message, .error-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .minifier-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .actions-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .options-grid {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-stats {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .minifier-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .code-area {
+                min-height: 250px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .option-item {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="minifier-container">
+        <div class="header">
+            <h1>⚡ HTML Minifier</h1>
+            <p>Optimize your HTML code by removing unnecessary whitespace and comments</p>
+        </div>
+
+        <div class="options-section">
+            <div class="options-title">
+                ⚙️ Minification Options
+            </div>
+            <div class="options-grid">
+                <div class="option-item" onclick="toggleOption('removeComments')">
+                    <div class="option-checkbox checked" id="removeComments"></div>
+                    <label class="option-label">Remove Comments</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('removeWhitespace')">
+                    <div class="option-checkbox checked" id="removeWhitespace"></div>
+                    <label class="option-label">Remove Extra Whitespace</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('removeLineBreaks')">
+                    <div class="option-checkbox checked" id="removeLineBreaks"></div>
+                    <label class="option-label">Remove Line Breaks</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('removeEmptyElements')">
+                    <div class="option-checkbox" id="removeEmptyElements"></div>
+                    <label class="option-label">Remove Empty Elements</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('removeAttributes')">
+                    <div class="option-checkbox" id="removeAttributes"></div>
+                    <label class="option-label">Remove Optional Attributes</label>
+                </div>
+                <div class="option-item" onclick="toggleOption('preservePreformatted')">
+                    <div class="option-checkbox checked" id="preservePreformatted"></div>
+                    <label class="option-label">Preserve &lt;pre&gt; Content</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-section">
+                <div class="section-label">
+                    📝 Original HTML
+                </div>
+                <textarea 
+                    class="code-area" 
+                    id="inputHTML" 
+                    placeholder="Paste your HTML code here..."
+                    oninput="updateInputStats()"
+                ></textarea>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span id="inputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📄</span>
+                        <span id="inputLines">0 lines</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>💬</span>
+                        <span id="inputComments">0 comments</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-label">
+                    ⚡ Minified HTML
+                </div>
+                <div class="output-area">
+                    <textarea 
+                        class="code-area" 
+                        id="outputHTML" 
+                        placeholder="Minified HTML will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                <div class="section-stats">
+                    <div class="stat-item">
+                        <span>✅</span>
+                        <span id="outputSize">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📉</span>
+                        <span id="compressionRatio">0% saved</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏱️</span>
+                        <span id="processingTime">0ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button class="action-btn btn-primary" id="minifyBtn" onclick="minifyHTML()">
+                ⚡ Minify HTML
+            </button>
+            <button class="action-btn btn-secondary" onclick="loadSample()">
+                📝 Load Sample
+            </button>
+            <button class="action-btn btn-success" id="copyBtn" onclick="copyOutput()">
+                📋 Copy Output
+            </button>
+            <button class="action-btn btn-danger" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div class="processing-indicator" id="processingIndicator">
+            <div class="spinner"></div>
+            Minifying your HTML code...
+        </div>
+
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <div class="stats-title">
+                📊 Minification Results
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="originalSize">0</div>
+                    <div class="stat-label">Original Size (bytes)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="minifiedSize">0</div>
+                    <div class="stat-label">Minified Size (bytes)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bytesSaved">0</div>
+                    <div class="stat-label">Bytes Saved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="percentageSaved">0%</div>
+                    <div class="stat-label">Percentage Saved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="linesSaved">0</div>
+                    <div class="stat-label">Lines Removed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section" id="comparisonSection" style="display: none;">
+            <div class="comparison-title">🔍 Before & After Preview</div>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <div class="comparison-label">Original HTML (first 500 chars)</div>
+                    <div class="comparison-code" id="originalPreview"></div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Minified HTML (first 500 chars)</div>
+                    <div class="comparison-code" id="minifiedPreview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-title">🛠️ Minification Features</div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-text">Remove HTML comments and whitespace</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Fast processing with instant results</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-text">Customizable minification options</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Detailed compression statistics</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">HTML minified successfully!</div>
+        <div class="error-message" id="errorMessage">Please enter some HTML code to minify.</div>
+    </div>
+
+    <script>
+        let options = {
+            removeComments: true,
+            removeWhitespace: true,
+            removeLineBreaks: true,
+            removeEmptyElements: false,
+            removeAttributes: false,
+            preservePreformatted: true
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInputStats();
+            
+            // Add entrance animation
+            document.querySelector('.minifier-container').style.opacity = '0';
+            document.querySelector('.minifier-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.minifier-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.minifier-container').style.opacity = '1';
+                document.querySelector('.minifier-container').style.transform = 'translateY(0)';
+            }, 100);
+
+            // Auto-focus input
+            document.getElementById('inputHTML').focus();
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            minifyHTML();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            copyOutput();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            loadSample();
+                            break;
+                        case 'k':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+            });
+        });
+
+        function toggleOption(optionName) {
+            options[optionName] = !options[optionName];
+            const checkbox = document.getElementById(optionName);
+            
+            if (options[optionName]) {
+                checkbox.classList.add('checked');
+            } else {
+                checkbox.classList.remove('checked');
+            }
+
+            // Auto-minify if there's content
+            const inputHTML = document.getElementById('inputHTML').value.trim();
+            if (inputHTML) {
+                setTimeout(minifyHTML, 100);
+            }
+        }
+
+        function updateInputStats() {
+            const inputHTML = document.getElementById('inputHTML').value;
+            const size = new Blob([inputHTML]).size;
+            const lines = inputHTML ? inputHTML.split('\n').length : 0;
+            const comments = (inputHTML.match(/<!--[\s\S]*?-->/g) || []).length;
+
+            document.getElementById('inputSize').textContent = `${size} bytes`;
+            document.getElementById('inputLines').textContent = `${lines} lines`;
+            document.getElementById('inputComments').textContent = `${comments} comments`;
+        }
+
+        function minifyHTML() {
+            const inputHTML = document.getElementById('inputHTML').value;
+            
+            if (!inputHTML.trim()) {
+                showError('Please enter some HTML code to minify.');
+                return;
+            }
+
+            showProcessing();
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    const startTime = performance.now();
+                    const result = processHTMLMinification(inputHTML);
+                    const endTime = performance.now();
+                    
+                    displayResult(inputHTML, result.minifiedHTML, endTime - startTime);
+                    hideProcessing();
+                    showSuccess('HTML minified successfully!');
+                } catch (error) {
+                    hideProcessing();
+                    showError('An error occurred while minifying the HTML.');
+                    console.error(error);
+                }
+            }, 100);
+        }
+
+        function processHTMLMinification(html) {
+            let minified = html;
+            
+            // Store preformatted content if preserve option is enabled
+            const preBlocks = [];
+            if (options.preservePreformatted) {
+                minified = minified.replace(/<(pre|code|script|style)[^>]*>[\s\S]*?<\/\1>/gi, function(match, tag) {
+                    const placeholder = `__PRESERVE_${preBlocks.length}__`;
+                    preBlocks.push(match);
+                    return placeholder;
+                });
+            }
+
+            // Remove HTML comments
+            if (options.removeComments) {
+                minified = minified.replace(/<!--[\s\S]*?-->/g, '');
+            }
+
+            // Remove extra whitespace between tags
+            if (options.removeWhitespace) {
+                minified = minified.replace(/>\s+</g, '><');
+                minified = minified.replace(/\s{2,}/g, ' ');
+            }
+
+            // Remove line breaks and trim
+            if (options.removeLineBreaks) {
+                minified = minified.replace(/\n\s*/g, '');
+                minified = minified.replace(/\r/g, '');
+            }
+
+            // Remove empty elements (except self-closing tags)
+            if (options.removeEmptyElements) {
+                minified = minified.replace(/<(\w+)([^>]*)>\s*<\/\1>/g, function(match, tag, attrs) {
+                    const selfClosing = ['img', 'br', 'hr', 'input', 'meta', 'link', 'area', 'base', 'col', 'embed', 'source', 'track', 'wbr'];
+                    if (!selfClosing.includes(tag.toLowerCase())) {
+                        return '';
+                    }
+                    return match;
+                });
+            }
+
+            // Remove optional attributes
+            if (options.removeAttributes) {
+                // Remove type="text/javascript" from script tags
+                minified = minified.replace(/(<script[^>]*)\s+type=["']text\/javascript["']/gi, '$1');
+                // Remove type="text/css" from style tags
+                minified = minified.replace(/(<style[^>]*)\s+type=["']text\/css["']/gi, '$1');
+                // Remove method="get" from forms
+                minified = minified.replace(/(<form[^>]*)\s+method=["']get["']/gi, '$1');
+            }
+
+            // Restore preformatted content
+            if (options.preservePreformatted) {
+                preBlocks.forEach((block, index) => {
+                    minified = minified.replace(`__PRESERVE_${index}__`, block);
+                });
+            }
+
+            // Final cleanup
+            minified = minified.trim();
+
+            return {
+                minifiedHTML: minified
+            };
+        }
+
+        function displayResult(originalHTML, minifiedHTML, processingTime) {
+            document.getElementById('outputHTML').value = minifiedHTML;
+            
+            // Calculate statistics
+            const originalSize = new Blob([originalHTML]).size;
+            const minifiedSize = new Blob([minifiedHTML]).size;
+            const bytesSaved = originalSize - minifiedSize;
+            const percentageSaved = originalSize > 0 ? Math.round((bytesSaved / originalSize) * 100) : 0;
+            const originalLines = originalHTML.split('\n').length;
+            const minifiedLines = minifiedHTML.split('\n').length;
+            const linesSaved = originalLines - minifiedLines;
+
+            // Update output stats
+            document.getElementById('outputSize').textContent = `${minifiedSize} bytes`;
+            document.getElementById('compressionRatio').textContent = `${percentageSaved}% saved`;
+            document.getElementById('processingTime').textContent = `${Math.round(processingTime)}ms`;
+
+            // Update detailed stats
+            document.getElementById('originalSize').textContent = originalSize.toLocaleString();
+            document.getElementById('minifiedSize').textContent = minifiedSize.toLocaleString();
+            document.getElementById('bytesSaved').textContent = bytesSaved.toLocaleString();
+            document.getElementById('percentageSaved').textContent = percentageSaved + '%';
+            document.getElementById('linesSaved').textContent = linesSaved.toLocaleString();
+
+            // Update comparison previews
+            const maxPreviewLength = 500;
+            document.getElementById('originalPreview').textContent = 
+                originalHTML.length > maxPreviewLength 
+                    ? originalHTML.substring(0, maxPreviewLength) + '...' 
+                    : originalHTML;
+            
+            document.getElementById('minifiedPreview').textContent = 
+                minifiedHTML.length > maxPreviewLength 
+                    ? minifiedHTML.substring(0, maxPreviewLength) + '...' 
+                    : minifiedHTML;
+
+            // Show sections
+            document.getElementById('statsSection').style.display = 'block';
+            document.getElementById('comparisonSection').style.display = 'block';
+
+            // Enable copy button
+            document.getElementById('copyBtn').classList.remove('btn-disabled');
+        }
+
+        function showProcessing() {
+            document.getElementById('processingIndicator').style.display = 'block';
+            document.getElementById('minifyBtn').classList.add('btn-disabled');
+            document.getElementById('minifyBtn').disabled = true;
+        }
+
+        function hideProcessing() {
+            document.getElementById('processingIndicator').style.display = 'none';
+            document.getElementById('minifyBtn').classList.remove('btn-disabled');
+            document.getElementById('minifyBtn').disabled = false;
+        }
+
+        async function copyOutput() {
+            const outputHTML = document.getElementById('outputHTML').value;
+            
+            if (!outputHTML.trim()) {
+                showError('No output to copy. Please minify some HTML first.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputHTML);
+                showSuccess('Minified HTML copied to clipboard!');
+                
+                // Update button appearance
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('btn-disabled');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-disabled');
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputHTML;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showSuccess('Minified HTML copied to clipboard!');
+                } catch (fallbackErr) {
+                    showError('Failed to copy. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputHTML').value = '';
+            document.getElementById('outputHTML').value = '';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('comparisonSection').style.display = 'none';
+            
+            updateInputStats();
+            document.getElementById('outputSize').textContent = '0 bytes';
+            document.getElementById('compressionRatio').textContent = '0% saved';
+            document.getElementById('processingTime').textContent = '0ms';
+            
+            showSuccess('All content cleared!');
+            document.getElementById('inputHTML').focus();
+        }
+
+        function loadSample() {
+            const sampleHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample HTML Document</title>
+    <style type="text/css">
+        /* This is a CSS comment */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- This is an HTML comment that can be removed during minification -->
+    <div class="container">
+        <h1>Welcome to the Sample Page</h1>
+        
+        <p>This is a sample HTML document with various elements that can be minified.</p>
+        
+        <ul>
+            <li>List item 1</li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ul>
+        
+        <form method="get" action="/search">
+            <input type="text" name="query" placeholder="Search...">
+            <button type="submit">Search</button>
+        </form>
+        
+        <script type="text/javascript">
+            // This JavaScript comment will be preserved
+            console.log('Hello from the sample page!');
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Page loaded successfully');
+            });
+        </script>
+    </div>
+</body>
+</html>`;
+
+            document.getElementById('inputHTML').value = sampleHTML;
+            updateInputStats();
+            showSuccess('Sample HTML loaded!');
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
