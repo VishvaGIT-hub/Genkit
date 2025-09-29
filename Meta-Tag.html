@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="favicon-16x16.png" type="image/x-icon">
+<link rel="icon" href="favicon-16x16.png" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meta Tag Analyzer</title>
+    <title>Meta Tag Analyzer - SEO Analysis Tool</title>
     <style>
         * {
             margin: 0;
@@ -14,23 +14,22 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
             padding: 30px;
             text-align: center;
@@ -43,385 +42,183 @@
         }
 
         .header p {
-            font-size: 1.1rem;
             opacity: 0.9;
+            font-size: 1.1rem;
         }
 
         .main-content {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 30px;
-            padding: 30px;
-        }
-
-        .input-panel {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            height: fit-content;
-        }
-
-        .results-panel {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-        }
-
-        .section-title {
-            color: #007bff;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 8px;
+            padding: 40px;
         }
 
         .url-input-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
+            background: #f8faff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
             border: 2px solid #e9ecef;
-            margin-bottom: 20px;
-            transition: border-color 0.3s ease;
         }
 
-        .url-input-section:focus-within {
-            border-color: #007bff;
-        }
-
-        .input-label {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .url-input-container {
+        .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        #urlInput {
+        .url-input {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
+            padding: 15px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            outline: none;
+            transition: all 0.3s ease;
         }
 
-        #urlInput:focus {
+        .url-input:focus {
             border-color: #007bff;
-            outline: none;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
-        .demo-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-            margin-bottom: 20px;
-        }
-
-        .demo-title {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 15px;
-        }
-
-        .demo-urls {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .demo-url {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 4px;
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .demo-url:hover {
-            border-color: #007bff;
-            background: #e3f2fd;
-        }
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
         .btn {
-            padding: 12px 20px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
 
         .btn-primary {
-            background: #007bff;
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #0056b3;
+            background: linear-gradient(135deg, #0056b3, #004085);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-        }
-
-        .btn-primary:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #1e7e34;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d, #545b62);
             color: white;
         }
 
         .btn-secondary:hover {
-            background: #545b62;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+            background: linear-gradient(135deg, #545b62, #495057);
         }
 
-        .loading {
-            display: none;
-            text-align: center;
+        .demo-section {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
             padding: 20px;
-            color: #007bff;
+            margin-bottom: 20px;
         }
 
-        .loading.show {
-            display: block;
+        .demo-title {
+            color: #856404;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e9ecef;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .demo-btn {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            background: #0056b3;
         }
 
         .analysis-results {
             display: none;
+            margin-top: 30px;
         }
 
-        .analysis-results.show {
+        .analysis-results.active {
             display: block;
         }
 
-        .page-info {
-            background: white;
-            border-radius: 8px;
+        .results-header {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
             padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .results-content {
+            background: #f8f9fa;
             border: 2px solid #e9ecef;
-            margin-bottom: 20px;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 0;
         }
 
-        .page-title {
+        .tab-navigation {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
             font-weight: 600;
-            color: #007bff;
-            margin-bottom: 10px;
-        }
-
-        .page-url {
-            font-family: 'Courier New', monospace;
             color: #6c757d;
-            font-size: 0.9rem;
-            word-break: break-all;
+            transition: all 0.3s ease;
         }
 
-        .meta-tag-grid {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 20px;
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .meta-tag-item {
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
+            margin-bottom: 20px;
             border: 2px solid #e9ecef;
             transition: all 0.3s ease;
         }
 
         .meta-tag-item:hover {
             border-color: #007bff;
-        }
-
-        .meta-tag-item.warning {
-            border-color: #ffc107;
-            background: #fff3cd;
-        }
-
-        .meta-tag-item.error {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .meta-tag-item.success {
-            border-color: #28a745;
-            background: #d4edda;
+            transform: translateY(-2px);
         }
 
         .meta-tag-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .meta-tag-name {
-            font-weight: 600;
-            color: #007bff;
-            font-size: 1.1rem;
-        }
-
-        .meta-tag-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .status-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .status-error {
-            background: #dc3545;
-            color: white;
-        }
-
-        .meta-tag-content {
-            background: #f8f9fa;
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #e9ecef;
-        }
-
-        .meta-content-text {
-            font-family: 'Courier New', monospace;
-            color: #333;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            word-break: break-all;
-        }
-
-        .meta-tag-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 8px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
-        }
-
-        .stat-value {
-            font-weight: 600;
-            color: #007bff;
-            font-size: 1.1rem;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-
-        .suggestions {
-            background: #e3f2fd;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            padding: 12px;
-        }
-
-        .suggestions-title {
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .suggestion-list {
-            list-style: none;
-        }
-
-        .suggestion-list li {
-            color: #0056b3;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-            position: relative;
-            padding-left: 15px;
-        }
-
-        .suggestion-list li::before {
-            content: "💡";
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        .source-viewer {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-            margin-bottom: 20px;
-        }
-
-        .source-header {
             display: flex;
             justify-content: between;
             align-items: center;
@@ -430,167 +227,146 @@
             gap: 10px;
         }
 
-        .source-title {
+        .meta-tag-name {
+            font-size: 1.2rem;
             font-weight: 600;
             color: #007bff;
             flex: 1;
         }
 
-        .source-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            border-radius: 4px;
-        }
-
-        .source-code {
-            background: #1e1e1e;
-            border-radius: 4px;
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .source-code pre {
-            color: #f8f8f2;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        .html-tag {
-            color: #f92672;
-        }
-
-        .html-attr {
-            color: #66d9ef;
-        }
-
-        .html-value {
-            color: #a6e22e;
-        }
-
-        .summary-stats {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-            margin-bottom: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-        }
-
-        .summary-stat {
-            text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-        }
-
-        .summary-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #007bff;
-            margin-bottom: 5px;
-        }
-
-        .summary-stat-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .export-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #e9ecef;
-        }
-
-        .export-title {
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: #007bff;
+        }
+
+        .status-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .meta-tag-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            border-left: 4px solid #007bff;
+        }
+
+        .meta-tag-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin-bottom: 15px;
         }
 
-        .export-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 12px 20px;
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8faff;
             border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
             font-weight: 600;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-            z-index: 1000;
+            color: #007bff;
         }
 
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
+        .recommendations {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
         }
 
-        .notification.error {
-            background: #dc3545;
+        .recommendations h4 {
+            color: #0056b3;
+            margin-bottom: 10px;
         }
 
-        .notification.warning {
-            background: #ffc107;
-            color: #212529;
+        .recommendations ul {
+            margin-left: 20px;
+        }
+
+        .recommendations li {
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .source-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-left: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .cors-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 6px;
-            padding: 15px;
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
-        .cors-notice-title {
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 8px;
+        .cors-notice h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
         }
 
-        .cors-notice-text {
-            color: #856404;
-            font-size: 0.9rem;
-            line-height: 1.5;
+        .cors-notice p {
+            color: #0c5460;
+            margin-bottom: 10px;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-
             .header {
                 padding: 20px;
             }
@@ -603,36 +379,34 @@
                 padding: 20px;
             }
 
-            .url-input-container {
+            .input-group {
                 flex-direction: column;
             }
 
-            .meta-tag-header {
+            .tab-navigation {
                 flex-direction: column;
-                align-items: flex-start;
             }
 
             .meta-tag-stats {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .export-actions {
+            .demo-buttons {
                 flex-direction: column;
             }
 
-            .source-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .demo-btn {
+                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
             body {
                 padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
             }
 
             .header h1 {
@@ -643,18 +417,35 @@
                 padding: 15px;
             }
 
-            .input-panel,
-            .results-panel {
+            .url-input-section {
                 padding: 20px;
             }
 
             .meta-tag-stats {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .seo-score {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -662,113 +453,81 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Meta Tag Analyzer</h1>
-            <p>Analyze webpage meta tags for SEO optimization and best practices compliance</p>
+            <p>Comprehensive SEO meta tag analysis and optimization suggestions</p>
         </div>
 
         <div class="main-content">
-            <div class="input-panel">
-                <div class="section-title">URL Analysis</div>
-                
+            <div class="url-input-section">
                 <div class="cors-notice">
-                    <div class="cors-notice-title">⚠️ Browser Limitation Notice</div>
-                    <div class="cors-notice-text">
-                        Due to CORS restrictions, this tool cannot directly fetch external websites. 
-                        Use the demo examples below or implement server-side functionality for full analysis.
-                    </div>
+                    <h4>📋 How to Use This Tool</h4>
+                    <p><strong>Demo Mode:</strong> Try the demo buttons below to see sample analyses of popular websites.</p>
+                    <p><strong>Live Analysis:</strong> For real-time URL analysis, this tool requires a backend server due to browser security restrictions (CORS policy).</p>
+                    <p><strong>Implementation:</strong> Contact your developer to set up a proxy server or use our API service for live URL analysis.</p>
                 </div>
 
-                <div class="url-input-section">
-                    <label class="input-label">🌐 Website URL</label>
-                    <div class="url-input-container">
-                        <input type="url" id="urlInput" placeholder="https://example.com" value="">
-                    </div>
+                <div class="input-group">
+                    <input type="url" class="url-input" id="urlInput" placeholder="Enter website URL (e.g., https://example.com)" value="">
+                    <button class="btn btn-primary" onclick="analyzeUrl()">
+                        🔍 Analyze Meta Tags
+                    </button>
                 </div>
 
                 <div class="demo-section">
-                    <div class="demo-title">📋 Demo Examples</div>
-                    <div class="demo-urls">
-                        <div class="demo-url" data-demo="ecommerce">E-commerce Site (Good SEO)</div>
-                        <div class="demo-url" data-demo="blog">Blog Article (Needs Improvement)</div>
-                        <div class="demo-url" data-demo="corporate">Corporate Website (Poor SEO)</div>
-                        <div class="demo-url" data-demo="news">News Article (Excellent SEO)</div>
+                    <div class="demo-title">🚀 Try Demo Analysis:</div>
+                    <div class="demo-buttons">
+                        <button class="demo-btn" onclick="runDemo('google')">Google.com</button>
+                        <button class="demo-btn" onclick="runDemo('github')">GitHub.com</button>
+                        <button class="demo-btn" onclick="runDemo('stackoverflow')">Stack Overflow</button>
+                        <button class="demo-btn" onclick="runDemo('amazon')">Amazon.com</button>
+                        <button class="demo-btn" onclick="runDemo('ecommerce')">E-commerce Site</button>
+                        <button class="demo-btn" onclick="runDemo('blog')">Blog Website</button>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn btn-primary" id="analyzeBtn">
-                        <span>🔍</span> Analyze Meta Tags
-                    </button>
-                    <button class="btn btn-secondary" id="clearBtn">
-                        <span>🗑️</span> Clear Results
-                    </button>
-                </div>
+                <button class="btn btn-secondary" onclick="showImplementationGuide()">
+                    📚 Implementation Guide
+                </button>
             </div>
 
-            <div class="results-panel">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <div>Analyzing meta tags...</div>
+            <div class="analysis-results" id="analysisResults">
+                <div class="loading" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing meta tags...</p>
                 </div>
 
-                <div class="analysis-results" id="analysisResults">
-                    <div class="section-title">Analysis Results</div>
-                    
-                    <div class="page-info" id="pageInfo">
-                        <div class="page-title" id="pageTitle">Page Title</div>
-                        <div class="page-url" id="pageUrl">https://example.com</div>
+                <div id="resultsContent" style="display: none;">
+                    <div class="results-header">
+                        <h2 id="analyzedUrl">Analysis Results</h2>
+                        <p>SEO Meta Tag Analysis Report</p>
                     </div>
 
-                    <div class="summary-stats">
-                        <div class="section-title">SEO Score Overview</div>
-                        <div class="stats-grid">
-                            <div class="summary-stat">
-                                <div class="summary-stat-value" id="overallScore">0</div>
-                                <div class="summary-stat-label">Overall Score</div>
-                            </div>
-                            <div class="summary-stat">
-                                <div class="summary-stat-value" id="passedChecks">0</div>
-                                <div class="summary-stat-label">Passed Checks</div>
-                            </div>
-                            <div class="summary-stat">
-                                <div class="summary-stat-value" id="warningChecks">0</div>
-                                <div class="summary-stat-label">Warnings</div>
-                            </div>
-                            <div class="summary-stat">
-                                <div class="summary-stat-value" id="errorChecks">0</div>
-                                <div class="summary-stat-label">Errors</div>
-                            </div>
+                    <div class="results-content">
+                        <div class="tab-navigation">
+                            <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+                            <button class="tab-btn" onclick="switchTab('details')">🏷️ Meta Tags</button>
+                            <button class="tab-btn" onclick="switchTab('seo')">🎯 SEO Analysis</button>
+                            <button class="tab-btn" onclick="switchTab('source')">📝 Source Code</button>
                         </div>
-                    </div>
 
-                    <div class="meta-tag-grid" id="metaTagGrid">
-                        <!-- Meta tag analysis results will be populated here -->
-                    </div>
-
-                    <div class="source-viewer">
-                        <div class="source-header">
-                            <div class="source-title">📄 HTML Source</div>
-                            <div class="source-actions">
-                                <button class="btn btn-success btn-small" id="copySourceBtn">Copy</button>
-                                <button class="btn btn-secondary btn-small" id="downloadSourceBtn">Download</button>
+                        <div class="tab-content active" id="overview-tab">
+                            <div class="seo-score">
+                                <div class="score-circle" id="seoScore">85</div>
+                                <h3>SEO Score</h3>
+                                <p>Overall meta tag optimization rating</p>
                             </div>
+                            <div id="overviewContent"></div>
                         </div>
-                        <div class="source-code">
-                            <pre id="sourceCode"><!-- Meta tags will appear here --></pre>
-                        </div>
-                    </div>
 
-                    <div class="export-section">
-                        <div class="export-title">📤 Export Results</div>
-                        <div class="export-actions">
-                            <button class="btn btn-success" id="exportReportBtn">
-                                <span>📊</span> Export Report
-                            </button>
-                            <button class="btn btn-success" id="exportJsonBtn">
-                                <span>📄</span> Export JSON
-                            </button>
-                            <button class="btn btn-success" id="exportCsvBtn">
-                                <span>📋</span> Export CSV
-                            </button>
+                        <div class="tab-content" id="details-tab">
+                            <div id="metaTagsContent"></div>
+                        </div>
+
+                        <div class="tab-content" id="seo-tab">
+                            <div id="seoAnalysisContent"></div>
+                        </div>
+
+                        <div class="tab-content" id="source-tab">
+                            <div class="source-code" id="sourceCodeContent"></div>
                         </div>
                     </div>
                 </div>
@@ -776,575 +535,695 @@
         </div>
     </div>
 
-    <div id="notification" class="notification">
-        Analysis completed successfully!
-    </div>
-
     <script>
-        class MetaTagAnalyzer {
-            constructor() {
-                this.currentAnalysis = null;
-                this.demoData = this.generateDemoData();
-                
-                this.initEventListeners();
+        // Demo data for different website types
+        const demoData = {
+            google: {
+                url: 'https://www.google.com',
+                title: 'Google',
+                description: 'Search the world\'s information, including webpages, images, videos and more. Google has many special features to help you find exactly what you\'re looking for.',
+                keywords: '',
+                viewport: 'width=device-width,initial-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'Google',
+                ogDescription: 'Search the world\'s information, including webpages, images, videos and more.',
+                ogImage: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png',
+                twitterCard: 'summary',
+                canonicalUrl: 'https://www.google.com/',
+                author: '',
+                publisher: 'Google',
+                language: 'en'
+            },
+            github: {
+                url: 'https://github.com',
+                title: 'GitHub: Let\'s build from here',
+                description: 'GitHub is where over 100 million developers shape the future of software, together. Contribute to the open source community, manage Git repositories, and collaborate on code.',
+                keywords: 'git,github,developer,collaboration,coding,software development',
+                viewport: 'width=device-width,initial-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'GitHub: Let\'s build from here',
+                ogDescription: 'GitHub is where over 100 million developers shape the future of software, together.',
+                ogImage: 'https://github.githubassets.com/images/modules/site/social-cards/github-social.png',
+                twitterCard: 'summary_large_image',
+                canonicalUrl: 'https://github.com/',
+                author: 'GitHub',
+                publisher: 'GitHub, Inc.',
+                language: 'en'
+            },
+            stackoverflow: {
+                url: 'https://stackoverflow.com',
+                title: 'Stack Overflow - Where Developers Learn, Share, & Build Careers',
+                description: 'Stack Overflow is the largest, most trusted online community for developers to learn, share their programming knowledge, and build their careers.',
+                keywords: 'programming,coding,development,Q&A,developers,software',
+                viewport: 'width=device-width,initial-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'Stack Overflow - Where Developers Learn, Share, & Build Careers',
+                ogDescription: 'Stack Overflow is the largest, most trusted online community for developers.',
+                ogImage: 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png',
+                twitterCard: 'summary',
+                canonicalUrl: 'https://stackoverflow.com/',
+                author: 'Stack Overflow',
+                publisher: 'Stack Exchange Inc.',
+                language: 'en'
+            },
+            amazon: {
+                url: 'https://www.amazon.com',
+                title: 'Amazon.com. Spend less. Smile more.',
+                description: 'Free shipping on millions of items. Get the best of Shopping and Entertainment with Prime. Enjoy low prices and great deals on the largest selection of everyday essentials and other products.',
+                keywords: 'amazon,shopping,online shopping,ecommerce,deals,products',
+                viewport: 'width=device-width,initial-scale=1,maximum-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'Amazon.com. Spend less. Smile more.',
+                ogDescription: 'Free shipping on millions of items. Get the best of Shopping and Entertainment with Prime.',
+                ogImage: 'https://m.media-amazon.com/images/G/01/social/api-share/amazon_logo_500500._V1_.png',
+                twitterCard: 'summary',
+                canonicalUrl: 'https://www.amazon.com/',
+                author: 'Amazon',
+                publisher: 'Amazon.com, Inc.',
+                language: 'en-US'
+            },
+            ecommerce: {
+                url: 'https://example-store.com',
+                title: 'Premium Online Store - Quality Products & Fast Shipping',
+                description: 'Shop the latest trends in fashion, electronics, home decor and more. Free shipping on orders over $50. 30-day returns. Customer satisfaction guaranteed.',
+                keywords: 'online store,shopping,fashion,electronics,home decor,free shipping',
+                viewport: 'width=device-width,initial-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'Premium Online Store - Quality Products & Fast Shipping',
+                ogDescription: 'Shop the latest trends with free shipping on orders over $50.',
+                ogImage: 'https://example-store.com/images/store-preview.jpg',
+                twitterCard: 'summary_large_image',
+                canonicalUrl: 'https://example-store.com/',
+                author: 'Store Team',
+                publisher: 'Example Store Inc.',
+                language: 'en'
+            },
+            blog: {
+                url: 'https://example-blog.com',
+                title: 'Tech Insights Blog - Latest Technology News & Tutorials',
+                description: 'Stay updated with the latest technology trends, programming tutorials, and industry insights. Expert articles on web development, AI, cybersecurity, and more.',
+                keywords: 'technology blog,programming,web development,AI,tutorials,tech news',
+                viewport: 'width=device-width,initial-scale=1',
+                charset: 'UTF-8',
+                robots: 'index,follow',
+                ogTitle: 'Tech Insights Blog - Latest Technology News & Tutorials',
+                ogDescription: 'Stay updated with the latest technology trends and programming tutorials.',
+                ogImage: 'https://example-blog.com/images/blog-featured.jpg',
+                twitterCard: 'summary_large_image',
+                canonicalUrl: 'https://example-blog.com/',
+                author: 'Tech Blog Team',
+                publisher: 'Tech Insights Media',
+                language: 'en'
+            }
+        };
+
+        function analyzeUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                alert('Please enter a valid URL');
+                return;
             }
 
-            initEventListeners() {
-                // Analyze button
-                document.getElementById('analyzeBtn').addEventListener('click', () => {
-                    this.analyzeUrl();
-                });
+            // Show loading state
+            document.getElementById('analysisResults').classList.add('active');
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsContent').style.display = 'none';
 
-                // Clear button
-                document.getElementById('clearBtn').addEventListener('click', () => {
-                    this.clearResults();
-                });
+            // Simulate analysis (in real implementation, this would be an API call)
+            setTimeout(() => {
+                // Check if it's a demo URL
+                const demoKey = Object.keys(demoData).find(key => 
+                    url.toLowerCase().includes(key) || 
+                    demoData[key].url.toLowerCase().includes(url.toLowerCase().split('/')[2])
+                );
 
-                // Demo buttons
-                document.querySelectorAll('.demo-url').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.loadDemo(e.target.dataset.demo);
-                    });
-                });
-
-                // Export buttons
-                document.getElementById('copySourceBtn').addEventListener('click', () => {
-                    this.copySource();
-                });
-
-                document.getElementById('downloadSourceBtn').addEventListener('click', () => {
-                    this.downloadSource();
-                });
-
-                document.getElementById('exportReportBtn').addEventListener('click', () => {
-                    this.exportReport();
-                });
-
-                document.getElementById('exportJsonBtn').addEventListener('click', () => {
-                    this.exportJson();
-                });
-
-                document.getElementById('exportCsvBtn').addEventListener('click', () => {
-                    this.exportCsv();
-                });
-
-                // URL input validation
-                document.getElementById('urlInput').addEventListener('input', (e) => {
-                    this.validateUrl(e.target.value);
-                });
-            }
-
-            generateDemoData() {
-                return {
-                    ecommerce: {
-                        url: 'https://example-shop.com/product/wireless-headphones',
-                        title: 'Wireless Bluetooth Headphones - Premium Sound Quality | ExampleShop',
-                        metaTags: {
-                            title: {
-                                content: 'Wireless Bluetooth Headphones - Premium Sound Quality | ExampleShop',
-                                length: 71
-                            },
-                            description: {
-                                content: 'Discover our premium wireless Bluetooth headphones with noise cancellation, 30-hour battery life, and crystal-clear sound. Free shipping on orders over $50.',
-                                length: 157
-                            },
-                            keywords: {
-                                content: 'wireless headphones, bluetooth headphones, noise cancellation, premium audio',
-                                length: 84
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37
-                            },
-                            'og:title': {
-                                content: 'Wireless Bluetooth Headphones - Premium Sound',
-                                length: 46
-                            },
-                            'og:description': {
-                                content: 'Premium wireless headphones with advanced noise cancellation and 30-hour battery life.',
-                                length: 95
-                            },
-                            'og:image': {
-                                content: 'https://example-shop.com/images/headphones-hero.jpg',
-                                length: 54
-                            },
-                            'twitter:card': {
-                                content: 'summary_large_image',
-                                length: 19
-                            }
-                        }
-                    },
-                    blog: {
-                        url: 'https://myblog.com/how-to-improve-seo',
-                        title: 'How to Improve SEO',
-                        metaTags: {
-                            title: {
-                                content: 'How to Improve SEO',
-                                length: 18
-                            },
-                            description: {
-                                content: 'Learn SEO tips',
-                                length: 14
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37
-                            }
-                        }
-                    },
-                    corporate: {
-                        url: 'https://corporatesite.com',
-                        title: 'Home',
-                        metaTags: {
-                            title: {
-                                content: 'Home',
-                                length: 4
-                            }
-                        }
-                    },
-                    news: {
-                        url: 'https://newssite.com/breaking-tech-innovation-2024',
-                        title: 'Breaking: Revolutionary AI Technology Announced for 2024 | TechNews Daily',
-                        metaTags: {
-                            title: {
-                                content: 'Breaking: Revolutionary AI Technology Announced for 2024 | TechNews Daily',
-                                length: 72
-                            },
-                            description: {
-                                content: 'Major tech company unveils groundbreaking artificial intelligence platform that promises to transform how businesses operate. Read the full story with expert analysis.',
-                                length: 159
-                            },
-                            keywords: {
-                                content: 'AI technology, artificial intelligence, tech news, innovation, 2024, business transformation',
-                                length: 95
-                            },
-                            viewport: {
-                                content: 'width=device-width, initial-scale=1.0',
-                                length: 37
-                            },
-                            'og:title': {
-                                content: 'Revolutionary AI Technology Announced for 2024',
-                                length: 46
-                            },
-                            'og:description': {
-                                content: 'Major breakthrough in AI technology promises to transform business operations worldwide.',
-                                length: 93
-                            },
-                            'og:image': {
-                                content: 'https://newssite.com/images/ai-tech-2024.jpg',
-                                length: 44
-                            },
-                            'og:type': {
-                                content: 'article',
-                                length: 7
-                            },
-                            'twitter:card': {
-                                content: 'summary_large_image',
-                                length: 19
-                            },
-                            'twitter:site': {
-                                content: '@technewsdaily',
-                                length: 14
-                            },
-                            author: {
-                                content: 'Sarah Johnson',
-                                length: 12
-                            },
-                            'article:published_time': {
-                                content: '2024-01-15T10:30:00Z',
-                                length: 20
-                            }
-                        }
-                    }
-                };
-            }
-
-            validateUrl(url) {
-                const analyzeBtn = document.getElementById('analyzeBtn');
-                try {
-                    new URL(url);
-                    analyzeBtn.disabled = false;
-                    return true;
-                } catch {
-                    analyzeBtn.disabled = !url.startsWith('demo:');
-                    return false;
+                if (demoKey) {
+                    displayResults(demoData[demoKey]);
+                } else {
+                    // Show CORS limitation message for real URLs
+                    showCorsLimitation(url);
                 }
-            }
-
-            async analyzeUrl() {
-                const url = document.getElementById('urlInput').value.trim();
-                
-                if (!url) {
-                    this.showNotification('Please enter a URL to analyze', 'error');
-                    return;
-                }
-
-                this.showLoading();
-
-                // Simulate API call delay
-                setTimeout(() => {
-                    if (url.startsWith('demo:')) {
-                        const demoType = url.replace('demo:', '');
-                        this.analyzeDemo(demoType);
-                    } else {
-                        this.simulateAnalysis(url);
-                    }
-                }, 1500);
-            }
-
-            loadDemo(demoType) {
-                document.getElementById('urlInput').value = `demo:${demoType}`;
-                this.analyzeDemo(demoType);
-            }
-
-            analyzeDemo(demoType) {
-                const demoData = this.demoData[demoType];
-                if (!demoData) {
-                    this.showNotification('Demo data not found', 'error');
-                    this.hideLoading();
-                    return;
-                }
-
-                this.currentAnalysis = this.performAnalysis(demoData);
-                this.displayResults();
-                this.hideLoading();
-                this.showNotification('Demo analysis completed!');
-            }
-
-            simulateAnalysis(url) {
-                // Simulate a basic analysis for any URL
-                const simulatedData = {
-                    url: url,
-                    title: 'Unable to fetch due to CORS restrictions',
-                    metaTags: {
-                        title: {
-                            content: 'CORS restriction prevents fetching',
-                            length: 34
-                        },
-                        description: {
-                            content: 'This tool cannot fetch external URLs due to browser security restrictions',
-                            length: 74
-                        }
-                    }
-                };
-
-                this.currentAnalysis = this.performAnalysis(simulatedData);
-                this.displayResults();
-                this.hideLoading();
-                this.showNotification('Simulated analysis completed (CORS limited)', 'warning');
-            }
-
-            performAnalysis(data) {
-                const analysis = {
-                    url: data.url,
-                    title: data.title,
-                    metaTags: {},
-                    score: 0,
-                    passed: 0,
-                    warnings: 0,
-                    errors: 0
-                };
-
-                // Analyze each meta tag
-                Object.entries(data.metaTags).forEach(([name, tag]) => {
-                    const tagAnalysis = this.analyzeMetaTag(name, tag);
-                    analysis.metaTags[name] = tagAnalysis;
-
-                    // Update counters
-                    if (tagAnalysis.status === 'success') analysis.passed++;
-                    else if (tagAnalysis.status === 'warning') analysis.warnings++;
-                    else if (tagAnalysis.status === 'error') analysis.errors++;
-                });
-
-                // Calculate overall score
-                const totalChecks = analysis.passed + analysis.warnings + analysis.errors;
-                analysis.score = totalChecks > 0 ? Math.round((analysis.passed / totalChecks) * 100) : 0;
-
-                return analysis;
-            }
-
-            analyzeMetaTag(name, tag) {
-                const analysis = {
-                    name: name,
-                    content: tag.content,
-                    length: tag.length,
-                    status: 'success',
-                    suggestions: []
-                };
-
-                // Analyze based on tag type
-                switch (name) {
-                    case 'title':
-                        if (!tag.content) {
-                            analysis.status = 'error';
-                            analysis.suggestions.push('Title tag is missing');
-                        } else if (tag.length < 30) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('Title is too short (recommended: 30-60 characters)');
-                        } else if (tag.length > 60) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('Title is too long (recommended: 30-60 characters)');
-                        }
-                        break;
-
-                    case 'description':
-                        if (!tag.content) {
-                            analysis.status = 'error';
-                            analysis.suggestions.push('Meta description is missing');
-                        } else if (tag.length < 120) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('Description is too short (recommended: 120-160 characters)');
-                        } else if (tag.length > 160) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('Description is too long (recommended: 120-160 characters)');
-                        }
-                        break;
-
-                    case 'keywords':
-                        if (tag.content) {
-                            const keywordCount = tag.content.split(',').length;
-                            if (keywordCount > 10) {
-                                analysis.status = 'warning';
-                                analysis.suggestions.push('Too many keywords (recommended: 5-10 keywords)');
-                            }
-                        }
-                        break;
-
-                    case 'viewport':
-                        if (!tag.content.includes('width=device-width')) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('Should include width=device-width for mobile optimization');
-                        }
-                        break;
-
-                    case 'og:title':
-                        if (tag.length > 95) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('OpenGraph title too long (recommended: <95 characters)');
-                        }
-                        break;
-
-                    case 'og:description':
-                        if (tag.length > 200) {
-                            analysis.status = 'warning';
-                            analysis.suggestions.push('OpenGraph description too long (recommended: <200 characters)');
-                        }
-                        break;
-                }
-
-                // Add general suggestions for empty content
-                if (!tag.content && analysis.suggestions.length === 0) {
-                    analysis.suggestions.push('Consider adding content to this meta tag');
-                }
-
-                return analysis;
-            }
-
-            displayResults() {
-                if (!this.currentAnalysis) return;
-
-                // Update page info
-                document.getElementById('pageTitle').textContent = this.currentAnalysis.title;
-                document.getElementById('pageUrl').textContent = this.currentAnalysis.url;
-
-                // Update summary stats
-                document.getElementById('overallScore').textContent = `${this.currentAnalysis.score}%`;
-                document.getElementById('passedChecks').textContent = this.currentAnalysis.passed;
-                document.getElementById('warningChecks').textContent = this.currentAnalysis.warnings;
-                document.getElementById('errorChecks').textContent = this.currentAnalysis.errors;
-
-                // Display meta tags
-                this.displayMetaTags();
-
-                // Generate source code
-                this.generateSourceCode();
-
-                // Show results
-                document.getElementById('analysisResults').classList.add('show');
-            }
-
-            displayMetaTags() {
-                const grid = document.getElementById('metaTagGrid');
-                grid.innerHTML = '';
-
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
-                    const item = document.createElement('div');
-                    item.className = `meta-tag-item ${analysis.status}`;
-                    
-                    item.innerHTML = `
-                        <div class="meta-tag-header">
-                            <div class="meta-tag-name">${this.escapeHtml(name)}</div>
-                            <div class="meta-tag-status status-${analysis.status}">
-                                ${analysis.status.toUpperCase()}
-                            </div>
-                        </div>
-                        
-                        <div class="meta-tag-content">
-                            <div class="meta-content-text">${this.escapeHtml(analysis.content || 'No content')}</div>
-                        </div>
-                        
-                        <div class="meta-tag-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">${analysis.length}</div>
-                                <div class="stat-label">Characters</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">${analysis.content ? analysis.content.split(' ').length : 0}</div>
-                                <div class="stat-label">Words</div>
-                            </div>
-                        </div>
-                        
-                        ${analysis.suggestions.length > 0 ? `
-                            <div class="suggestions">
-                                <div class="suggestions-title">💡 Optimization Suggestions</div>
-                                <ul class="suggestion-list">
-                                    ${analysis.suggestions.map(s => `<li>${this.escapeHtml(s)}</li>`).join('')}
-                                </ul>
-                            </div>
-                        ` : ''}
-                    `;
-                    
-                    grid.appendChild(item);
-                });
-            }
-
-            generateSourceCode() {
-                if (!this.currentAnalysis) return;
-
-                let html = '';
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
-                    if (name === 'title') {
-                        html += `<span class="html-tag">&lt;title&gt;</span>${this.escapeHtml(analysis.content)}<span class="html-tag">&lt;/title&gt;</span>\n`;
-                    } else if (name.startsWith('og:') || name.startsWith('twitter:') || name === 'description' || name === 'keywords') {
-                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">${name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name'}</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(analysis.content)}"</span><span class="html-tag">&gt;</span>\n`;
-                    } else {
-                        html += `<span class="html-tag">&lt;meta</span> <span class="html-attr">name</span>=<span class="html-value">"${name}"</span> <span class="html-attr">content</span>=<span class="html-value">"${this.escapeHtml(analysis.content)}"</span><span class="html-tag">&gt;</span>\n`;
-                    }
-                });
-
-                document.getElementById('sourceCode').innerHTML = html;
-            }
-
-            showLoading() {
-                document.getElementById('loading').classList.add('show');
-                document.getElementById('analysisResults').classList.remove('show');
-            }
-
-            hideLoading() {
-                document.getElementById('loading').classList.remove('show');
-            }
-
-            clearResults() {
-                document.getElementById('urlInput').value = '';
-                document.getElementById('analysisResults').classList.remove('show');
-                this.currentAnalysis = null;
-                this.showNotification('Results cleared successfully!');
-            }
-
-            async copySource() {
-                const sourceCode = document.getElementById('sourceCode').textContent;
-                try {
-                    await navigator.clipboard.writeText(sourceCode);
-                    this.showNotification('Source code copied to clipboard!');
-                } catch (err) {
-                    this.showNotification('Failed to copy source code', 'error');
-                }
-            }
-
-            downloadSource() {
-                if (!this.currentAnalysis) return;
-
-                const sourceCode = document.getElementById('sourceCode').textContent;
-                this.downloadFile(sourceCode, 'meta-tags-source.html', 'text/html');
-                this.showNotification('Source code downloaded!');
-            }
-
-            exportReport() {
-                if (!this.currentAnalysis) return;
-
-                let report = `Meta Tag Analysis Report\n`;
-                report += `=======================\n\n`;
-                report += `URL: ${this.currentAnalysis.url}\n`;
-                report += `Title: ${this.currentAnalysis.title}\n`;
-                report += `Analysis Date: ${new Date().toLocaleDateString()}\n\n`;
-                report += `SEO Score: ${this.currentAnalysis.score}%\n`;
-                report += `Passed Checks: ${this.currentAnalysis.passed}\n`;
-                report += `Warnings: ${this.currentAnalysis.warnings}\n`;
-                report += `Errors: ${this.currentAnalysis.errors}\n\n`;
-
-                report += `Meta Tag Analysis:\n`;
-                report += `==================\n\n`;
-
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
-                    report += `${name.toUpperCase()}\n`;
-                    report += `Status: ${analysis.status.toUpperCase()}\n`;
-                    report += `Content: ${analysis.content}\n`;
-                    report += `Length: ${analysis.length} characters\n`;
-                    if (analysis.suggestions.length > 0) {
-                        report += `Suggestions: ${analysis.suggestions.join('; ')}\n`;
-                    }
-                    report += `\n`;
-                });
-
-                this.downloadFile(report, 'meta-tag-analysis-report.txt', 'text/plain');
-                this.showNotification('Report exported successfully!');
-            }
-
-            exportJson() {
-                if (!this.currentAnalysis) return;
-
-                const json = JSON.stringify(this.currentAnalysis, null, 2);
-                this.downloadFile(json, 'meta-tag-analysis.json', 'application/json');
-                this.showNotification('JSON data exported successfully!');
-            }
-
-            exportCsv() {
-                if (!this.currentAnalysis) return;
-
-                let csv = 'Meta Tag,Content,Length,Status,Suggestions\n';
-                Object.entries(this.currentAnalysis.metaTags).forEach(([name, analysis]) => {
-                    csv += `"${name}","${analysis.content}",${analysis.length},"${analysis.status}","${analysis.suggestions.join('; ')}"\n`;
-                });
-
-                this.downloadFile(csv, 'meta-tag-analysis.csv', 'text/csv');
-                this.showNotification('CSV data exported successfully!');
-            }
-
-            downloadFile(content, filename, mimeType) {
-                const blob = new Blob([content], { type: mimeType });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
-
-            escapeHtml(text) {
-                if (!text) return '';
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.className = `notification ${type}`;
-                notification.classList.add('show');
-
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
+            }, 2000);
         }
 
-        // Initialize the meta tag analyzer
-        document.addEventListener('DOMContentLoaded', () => {
-            new MetaTagAnalyzer();
-        });
+        function runDemo(type) {
+            const data = demoData[type];
+            document.getElementById('urlInput').value = data.url;
+            
+            // Show loading state
+            document.getElementById('analysisResults').classList.add('active');
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsContent').style.display = 'none';
+
+            // Simulate analysis
+            setTimeout(() => {
+                displayResults(data);
+            }, 1500);
+        }
+
+        function displayResults(data) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+            document.getElementById('analyzedUrl').textContent = data.url;
+
+            // Calculate SEO score
+            const seoScore = calculateSeoScore(data);
+            document.getElementById('seoScore').textContent = seoScore;
+
+            // Update score circle color
+            const scoreCircle = document.getElementById('seoScore');
+            if (seoScore >= 80) {
+                scoreCircle.parentElement.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            } else if (seoScore >= 60) {
+                scoreCircle.parentElement.style.background = 'linear-gradient(135deg, #ffc107, #e0a800)';
+            } else {
+                scoreCircle.parentElement.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+            }
+
+            // Populate overview
+            populateOverview(data, seoScore);
+
+            // Populate meta tags details
+            populateMetaTagsDetails(data);
+
+            // Populate SEO analysis
+            populateSeoAnalysis(data);
+
+            // Populate source code
+            populateSourceCode(data);
+
+            // Switch to overview tab
+            switchTab('overview');
+        }
+
+        function calculateSeoScore(data) {
+            let score = 0;
+            const checks = [
+                { condition: data.title && data.title.length >= 30 && data.title.length <= 60, points: 15 },
+                { condition: data.description && data.description.length >= 120 && data.description.length <= 160, points: 15 },
+                { condition: data.keywords && data.keywords.length > 0, points: 10 },
+                { condition: data.viewport, points: 10 },
+                { condition: data.charset, points: 5 },
+                { condition: data.robots, points: 5 },
+                { condition: data.ogTitle, points: 10 },
+                { condition: data.ogDescription, points: 10 },
+                { condition: data.ogImage, points: 10 },
+                { condition: data.canonicalUrl, points: 10 }
+            ];
+
+            checks.forEach(check => {
+                if (check.condition) score += check.points;
+            });
+
+            return score;
+        }
+
+        function populateOverview(data, seoScore) {
+            const overview = document.getElementById('overviewContent');
+            overview.innerHTML = `
+                <div class="meta-tag-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Title Length</div>
+                        <div class="stat-value">${data.title ? data.title.length : 0}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Description Length</div>
+                        <div class="stat-value">${data.description ? data.description.length : 0}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Keywords Count</div>
+                        <div class="stat-value">${data.keywords ? data.keywords.split(',').length : 0}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Open Graph Tags</div>
+                        <div class="stat-value">${countOgTags(data)}</div>
+                    </div>
+                </div>
+                <div class="recommendations">
+                    <h4>📈 Quick SEO Summary</h4>
+                    <ul>
+                        <li><strong>Overall Score:</strong> ${seoScore}/100 ${getScoreRating(seoScore)}</li>
+                        <li><strong>Title:</strong> ${getTitleStatus(data.title)}</li>
+                        <li><strong>Description:</strong> ${getDescriptionStatus(data.description)}</li>
+                        <li><strong>Social Media:</strong> ${getSocialStatus(data)}</li>
+                        <li><strong>Technical SEO:</strong> ${getTechnicalStatus(data)}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function populateMetaTagsDetails(data) {
+            const metaTags = document.getElementById('metaTagsContent');
+            const tags = [
+                {
+                    name: 'Title Tag',
+                    content: data.title,
+                    optimal: '30-60 characters',
+                    current: data.title ? data.title.length : 0,
+                    status: getTitleStatusBadge(data.title),
+                    recommendations: getTitleRecommendations(data.title)
+                },
+                {
+                    name: 'Meta Description',
+                    content: data.description,
+                    optimal: '120-160 characters',
+                    current: data.description ? data.description.length : 0,
+                    status: getDescriptionStatusBadge(data.description),
+                    recommendations: getDescriptionRecommendations(data.description)
+                },
+                {
+                    name: 'Meta Keywords',
+                    content: data.keywords || 'Not found',
+                    optimal: '5-10 relevant keywords',
+                    current: data.keywords ? data.keywords.split(',').length : 0,
+                    status: data.keywords ? 'status-good' : 'status-warning',
+                    recommendations: getKeywordsRecommendations(data.keywords)
+                },
+                {
+                    name: 'Viewport',
+                    content: data.viewport || 'Not found',
+                    optimal: 'width=device-width,initial-scale=1',
+                    current: data.viewport ? 'Present' : 'Missing',
+                    status: data.viewport ? 'status-good' : 'status-error',
+                    recommendations: getViewportRecommendations(data.viewport)
+                },
+                {
+                    name: 'Charset',
+                    content: data.charset || 'Not found',
+                    optimal: 'UTF-8',
+                    current: data.charset || 'Missing',
+                    status: data.charset === 'UTF-8' ? 'status-good' : 'status-warning',
+                    recommendations: getCharsetRecommendations(data.charset)
+                },
+                {
+                    name: 'Robots',
+                    content: data.robots || 'Not found',
+                    optimal: 'index,follow',
+                    current: data.robots || 'Missing',
+                    status: data.robots ? 'status-good' : 'status-warning',
+                    recommendations: getRobotsRecommendations(data.robots)
+                }
+            ];
+
+            metaTags.innerHTML = tags.map(tag => `
+                <div class="meta-tag-item">
+                    <div class="meta-tag-header">
+                        <div class="meta-tag-name">${tag.name}</div>
+                        <div class="status-badge ${tag.status}">
+                            ${tag.status === 'status-good' ? 'Good' : tag.status === 'status-warning' ? 'Warning' : 'Error'}
+                        </div>
+                    </div>
+                    <div class="meta-tag-content">${tag.content}</div>
+                    <div class="meta-tag-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Current</div>
+                            <div class="stat-value">${tag.current}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Optimal</div>
+                            <div class="stat-value">${tag.optimal}</div>
+                        </div>
+                    </div>
+                    <div class="recommendations">
+                        <h4>💡 Recommendations</h4>
+                        <ul>${tag.recommendations.map(rec => `<li>${rec}</li>`).join('')}</ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateSeoAnalysis(data) {
+            const seoAnalysis = document.getElementById('seoAnalysisContent');
+            seoAnalysis.innerHTML = `
+                <div class="meta-tag-item">
+                    <div class="meta-tag-header">
+                        <div class="meta-tag-name">🔍 SEO Checklist</div>
+                    </div>
+                    <div class="meta-tag-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">✅ Passed</div>
+                            <div class="stat-value">${countPassedSeoChecks(data)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">⚠️ Warnings</div>
+                            <div class="stat-value">${countWarningSeoChecks(data)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">❌ Failed</div>
+                            <div class="stat-value">${countFailedSeoChecks(data)}</div>
+                        </div>
+                    </div>
+                    <div class="recommendations">
+                        <h4>📋 Detailed SEO Analysis</h4>
+                        ${generateSeoChecklist(data)}
+                    </div>
+                </div>
+
+                <div class="meta-tag-item">
+                    <div class="meta-tag-header">
+                        <div class="meta-tag-name">📱 Social Media Tags</div>
+                    </div>
+                    <div class="meta-tag-content">
+                        <strong>Open Graph Title:</strong> ${data.ogTitle || 'Not found'}<br>
+                        <strong>Open Graph Description:</strong> ${data.ogDescription || 'Not found'}<br>
+                        <strong>Open Graph Image:</strong> ${data.ogImage || 'Not found'}<br>
+                        <strong>Twitter Card:</strong> ${data.twitterCard || 'Not found'}
+                    </div>
+                    <div class="recommendations">
+                        <h4>💡 Social Media Optimization</h4>
+                        <ul>
+                            ${getSocialMediaRecommendations(data).map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="meta-tag-item">
+                    <div class="meta-tag-header">
+                        <div class="meta-tag-name">⚙️ Technical SEO</div>
+                    </div>
+                    <div class="meta-tag-content">
+                        <strong>Canonical URL:</strong> ${data.canonicalUrl || 'Not found'}<br>
+                        <strong>Language:</strong> ${data.language || 'Not specified'}<br>
+                        <strong>Author:</strong> ${data.author || 'Not specified'}<br>
+                        <strong>Publisher:</strong> ${data.publisher || 'Not specified'}
+                    </div>
+                    <div class="recommendations">
+                        <h4>💡 Technical Improvements</h4>
+                        <ul>
+                            ${getTechnicalRecommendations(data).map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateSourceCode(data) {
+            const sourceCode = document.getElementById('sourceCodeContent');
+            sourceCode.innerHTML = `&lt;!DOCTYPE html&gt;
+&lt;html lang="${data.language || 'en'}"&gt;
+&lt;head&gt;
+    &lt;meta charset="${data.charset || 'UTF-8'}"&gt;
+    &lt;meta name="viewport" content="${data.viewport || 'width=device-width, initial-scale=1'}"&gt;
+    &lt;title&gt;${data.title || 'Page Title'}&lt;/title&gt;
+    &lt;meta name="description" content="${data.description || 'Page description'}"&gt;
+    ${data.keywords ? `&lt;meta name="keywords" content="${data.keywords}"&gt;` : ''}
+    ${data.robots ? `&lt;meta name="robots" content="${data.robots}"&gt;` : ''}
+    ${data.author ? `&lt;meta name="author" content="${data.author}"&gt;` : ''}
+    ${data.publisher ? `&lt;meta name="publisher" content="${data.publisher}"&gt;` : ''}
+    ${data.canonicalUrl ? `&lt;link rel="canonical" href="${data.canonicalUrl}"&gt;` : ''}
+    
+    &lt;!-- Open Graph tags --&gt;
+    ${data.ogTitle ? `&lt;meta property="og:title" content="${data.ogTitle}"&gt;` : ''}
+    ${data.ogDescription ? `&lt;meta property="og:description" content="${data.ogDescription}"&gt;` : ''}
+    ${data.ogImage ? `&lt;meta property="og:image" content="${data.ogImage}"&gt;` : ''}
+    &lt;meta property="og:url" content="${data.url}"&gt;
+    &lt;meta property="og:type" content="website"&gt;
+    
+    &lt;!-- Twitter Card tags --&gt;
+    ${data.twitterCard ? `&lt;meta name="twitter:card" content="${data.twitterCard}"&gt;` : ''}
+    ${data.ogTitle ? `&lt;meta name="twitter:title" content="${data.ogTitle}"&gt;` : ''}
+    ${data.ogDescription ? `&lt;meta name="twitter:description" content="${data.ogDescription}"&gt;` : ''}
+    ${data.ogImage ? `&lt;meta name="twitter:image" content="${data.ogImage}"&gt;` : ''}
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Page content --&gt;
+&lt;/body&gt;
+&lt;/html&gt;`;
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        function showCorsLimitation(url) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+            document.getElementById('analyzedUrl').textContent = url;
+            
+            const overview = document.getElementById('overviewContent');
+            overview.innerHTML = `
+                <div class="cors-notice">
+                    <h4>🚫 CORS Limitation Detected</h4>
+                    <p><strong>The URL "${url}" cannot be analyzed directly from the browser due to CORS (Cross-Origin Resource Sharing) policy.</strong></p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Use our demo examples above to see how the tool works</li>
+                        <li>Set up a backend proxy server to fetch external URLs</li>
+                        <li>Use a browser extension with special permissions</li>
+                        <li>Contact your developer to implement server-side URL fetching</li>
+                    </ul>
+                </div>
+                <div class="recommendations">
+                    <h4>📚 Implementation Guide</h4>
+                    <p>To make this tool work with any URL, you'll need:</p>
+                    <ul>
+                        <li><strong>Backend API:</strong> A server-side script that fetches the URL content</li>
+                        <li><strong>Proxy Service:</strong> Use services like CORS Anywhere or AllOrigins</li>
+                        <li><strong>Browser Extension:</strong> Create an extension with host permissions</li>
+                    </ul>
+                    <p>The demo functionality shows exactly how the analysis would work with real data!</p>
+                </div>
+            `;
+
+            // Clear other tabs
+            document.getElementById('metaTagsContent').innerHTML = '<p>Demo mode only - select a demo website above to see detailed analysis.</p>';
+            document.getElementById('seoAnalysisContent').innerHTML = '<p>Demo mode only - select a demo website above to see SEO analysis.</p>';
+            document.getElementById('sourceCodeContent').innerHTML = 'Demo mode only - select a demo website above to see source code.';
+        }
+
+        function showImplementationGuide() {
+            alert(`🔧 Implementation Guide for Live URL Analysis:
+
+1. BACKEND SOLUTION (Recommended):
+   - Create a server endpoint (PHP, Node.js, Python)
+   - Fetch URL content server-side
+   - Parse HTML and extract meta tags
+   - Return JSON data to frontend
+
+2. PROXY SERVICE:
+   - Use CORS Anywhere: https://cors-anywhere.herokuapp.com/
+   - Use AllOrigins: https://allorigins.win/
+   - Note: Public proxies may have limitations
+
+3. BROWSER EXTENSION:
+   - Create extension with host permissions
+   - Access any website's content
+   - Best for personal/internal use
+
+4. API SERVICES:
+   - Use existing SEO APIs
+   - Services like Screaming Frog, SEMrush API
+   - Usually require paid subscriptions
+
+The demo shows full functionality - implement backend for production use!`);
+        }
+
+        // Helper functions for status checking
+        function getScoreRating(score) {
+            if (score >= 80) return '🟢 Excellent';
+            if (score >= 60) return '🟡 Good';
+            if (score >= 40) return '🟠 Needs Improvement';
+            return '🔴 Poor';
+        }
+
+        function getTitleStatus(title) {
+            if (!title) return '❌ Missing';
+            if (title.length < 30) return '⚠️ Too short';
+            if (title.length > 60) return '⚠️ Too long';
+            return '✅ Optimal';
+        }
+
+        function getDescriptionStatus(description) {
+            if (!description) return '❌ Missing';
+            if (description.length < 120) return '⚠️ Too short';
+            if (description.length > 160) return '⚠️ Too long';
+            return '✅ Optimal';
+        }
+
+        function getSocialStatus(data) {
+            const hasOg = data.ogTitle && data.ogDescription && data.ogImage;
+            const hasTwitter = data.twitterCard;
+            if (hasOg && hasTwitter) return '✅ Complete';
+            if (hasOg || hasTwitter) return '⚠️ Partial';
+            return '❌ Missing';
+        }
+
+        function getTechnicalStatus(data) {
+            const checks = [data.viewport, data.charset, data.robots, data.canonicalUrl];
+            const passed = checks.filter(Boolean).length;
+            if (passed === 4) return '✅ Excellent';
+            if (passed >= 2) return '⚠️ Good';
+            return '❌ Needs work';
+        }
+
+        function getTitleStatusBadge(title) {
+            if (!title) return 'status-error';
+            if (title.length >= 30 && title.length <= 60) return 'status-good';
+            return 'status-warning';
+        }
+
+        function getDescriptionStatusBadge(description) {
+            if (!description) return 'status-error';
+            if (description.length >= 120 && description.length <= 160) return 'status-good';
+            return 'status-warning';
+        }
+
+        function countOgTags(data) {
+            let count = 0;
+            if (data.ogTitle) count++;
+            if (data.ogDescription) count++;
+            if (data.ogImage) count++;
+            if (data.twitterCard) count++;
+            return count;
+        }
+
+        function countPassedSeoChecks(data) {
+            const checks = [
+                data.title && data.title.length >= 30 && data.title.length <= 60,
+                data.description && data.description.length >= 120 && data.description.length <= 160,
+                data.viewport,
+                data.charset === 'UTF-8',
+                data.robots,
+                data.canonicalUrl,
+                data.ogTitle && data.ogDescription && data.ogImage
+            ];
+            return checks.filter(Boolean).length;
+        }
+
+        function countWarningSeoChecks(data) {
+            let warnings = 0;
+            if (data.title && (data.title.length < 30 || data.title.length > 60)) warnings++;
+            if (data.description && (data.description.length < 120 || data.description.length > 160)) warnings++;
+            if (!data.keywords) warnings++;
+            if (data.charset && data.charset !== 'UTF-8') warnings++;
+            return warnings;
+        }
+
+        function countFailedSeoChecks(data) {
+            const total = 10; // Total number of checks
+            return total - countPassedSeoChecks(data) - countWarningSeoChecks(data);
+        }
+
+        function generateSeoChecklist(data) {
+            const checks = [
+                { test: 'Title tag length (30-60 chars)', passed: data.title && data.title.length >= 30 && data.title.length <= 60 },
+                { test: 'Meta description length (120-160 chars)', passed: data.description && data.description.length >= 120 && data.description.length <= 160 },
+                { test: 'Meta keywords present', passed: data.keywords && data.keywords.length > 0 },
+                { test: 'Viewport meta tag', passed: data.viewport },
+                { test: 'UTF-8 charset', passed: data.charset === 'UTF-8' },
+                { test: 'Robots meta tag', passed: data.robots },
+                { test: 'Canonical URL', passed: data.canonicalUrl },
+                { test: 'Open Graph tags', passed: data.ogTitle && data.ogDescription && data.ogImage },
+                { test: 'Twitter Card tags', passed: data.twitterCard },
+                { test: 'Language declaration', passed: data.language }
+            ];
+
+            return '<ul>' + checks.map(check => 
+                `<li>${check.passed ? '✅' : '❌'} ${check.test}</li>`
+            ).join('') + '</ul>';
+        }
+
+        // Recommendation functions
+        function getTitleRecommendations(title) {
+            const recs = [];
+            if (!title) recs.push('Add a title tag to your page');
+            else if (title.length < 30) recs.push('Make your title longer (30-60 characters recommended)');
+            else if (title.length > 60) recs.push('Shorten your title (30-60 characters recommended)');
+            else recs.push('Title length is optimal');
+            
+            recs.push('Include your main keyword near the beginning');
+            recs.push('Make it descriptive and compelling');
+            recs.push('Avoid keyword stuffing');
+            return recs;
+        }
+
+        function getDescriptionRecommendations(description) {
+            const recs = [];
+            if (!description) recs.push('Add a meta description to your page');
+            else if (description.length < 120) recs.push('Make your description longer (120-160 characters recommended)');
+            else if (description.length > 160) recs.push('Shorten your description (120-160 characters recommended)');
+            else recs.push('Description length is optimal');
+            
+            recs.push('Include your main keywords naturally');
+            recs.push('Write compelling copy that encourages clicks');
+            recs.push('Avoid duplicate descriptions across pages');
+            return recs;
+        }
+
+        function getKeywordsRecommendations(keywords) {
+            const recs = [];
+            if (!keywords) {
+                recs.push('Consider adding meta keywords (though less important for SEO)');
+                recs.push('Focus on title and description optimization instead');
+            } else {
+                recs.push('Meta keywords have minimal SEO impact');
+                recs.push('Focus on content and title optimization');
+            }
+            return recs;
+        }
+
+        function getViewportRecommendations(viewport) {
+            const recs = [];
+            if (!viewport) {
+                recs.push('Add viewport meta tag for mobile responsiveness');
+                recs.push('Use: width=device-width,initial-scale=1');
+            } else {
+                recs.push('Viewport tag is properly configured');
+            }
+            return recs;
+        }
+
+        function getCharsetRecommendations(charset) {
+            const recs = [];
+            if (!charset) recs.push('Add charset declaration');
+            else if (charset !== 'UTF-8') recs.push('Consider using UTF-8 for best compatibility');
+            else recs.push('Charset is properly configured');
+            return recs;
+        }
+
+        function getRobotsRecommendations(robots) {
+            const recs = [];
+            if (!robots) {
+                recs.push('Add robots meta tag to control indexing');
+                recs.push('Use "index,follow" for normal pages');
+            } else {
+                recs.push('Robots directive is configured');
+            }
+            return recs;
+        }
+
+        function getSocialMediaRecommendations(data) {
+            const recs = [];
+            if (!data.ogTitle) recs.push('Add Open Graph title tag');
+            if (!data.ogDescription) recs.push('Add Open Graph description tag');
+            if (!data.ogImage) recs.push('Add Open Graph image tag (recommended: 1200x630px)');
+            if (!data.twitterCard) recs.push('Add Twitter Card meta tags');
+            if (data.ogTitle && data.ogDescription && data.ogImage && data.twitterCard) {
+                recs.push('Social media tags are well configured');
+            }
+            return recs;
+        }
+
+        function getTechnicalRecommendations(data) {
+            const recs = [];
+            if (!data.canonicalUrl) recs.push('Add canonical URL to prevent duplicate content issues');
+            if (!data.language) recs.push('Specify page language in html tag');
+            if (!data.author) recs.push('Consider adding author meta tag for content attribution');
+            if (!data.publisher) recs.push('Consider adding publisher meta tag for brand recognition');
+            return recs;
+        }
     </script>
 </body>
 </html>
