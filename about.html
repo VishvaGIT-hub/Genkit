@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="favicon-16x16.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - GenKit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fafbfc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #2563eb;
+        }
+
+        .contact-email {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #2563eb;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* About Content */
+        .about-content {
+            padding: 4rem 0;
+            background: #fff;
+        }
+
+        .about-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .about-section {
+            margin-bottom: 3rem;
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .about-section p {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .stats-section {
+            background: #f8fafc;
+            padding: 3rem 0;
+            margin: 3rem 0;
+            border-radius: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .team-section {
+            text-align: center;
+        }
+
+        .team-member {
+            max-width: 300px;
+            margin: 0 auto;
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            border-radius: 15px;
+            margin: 3rem 0;
+        }
+
+        .cta-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #fff;
+            color: #2563eb;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .footer-tagline {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin-right: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #2563eb;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu.active {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .about-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="index.html" class="logo">GenKit</a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html" class="active">About</a></li>
+                    <li><a href="index.html#tools">Tools</a></li>
+                    <li><a href="mailto:toolsguy1@gmail.com" class="contact-email">Contact</a></li>
+                </ul>
+                <button class="menu-toggle" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="mobile-menu" id="mobileMenu">
+                    <a href="index.html">Home</a>
+                    <a href="about.html" class="active">About</a>
+                    <a href="index.html#tools">Tools</a>
+                    <a href="mailto:toolsguy1@gmail.com">Contact</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>About GenKit</h1>
+            <p>Your comprehensive digital toolkit designed to simplify everyday tasks and boost productivity.</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-content">
+        <div class="container">
+            <div class="about-container">
+                <!-- Mission Section -->
+                <div class="about-section">
+                    <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                    <p>At GenKit, our mission is to democratize access to powerful digital tools. We believe that everyone should have access to professional-grade utilities without the need for expensive software or complex installations. Our platform brings together the most essential tools you need for daily digital tasks in one convenient, fast, and free location.</p>
+                    <p>We're passionate about saving you time, reducing complexity, and making your digital workflow as smooth as possible. Whether you're a professional developer, a student working on projects, or someone who just needs quick solutions for everyday digital challenges, GenKit is designed with you in mind.</p>
+                </div>
+
+                <!-- What Makes Us Different -->
+                <div class="about-section">
+                    <h2><i class="fas fa-star"></i> What Makes Us Different</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                            <h3>Lightning Fast</h3>
+                            <p>All tools are optimized for speed and performance, giving you instant results without any waiting time.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                            <h3>Privacy First</h3>
+                            <p>Your data stays secure. Most tools work locally in your browser, ensuring your files never leave your device.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <h3>Works Everywhere</h3>
+                            <p>Fully responsive design that works seamlessly on desktop, tablet, and mobile devices.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                            <h3>Always Free</h3>
+                            <p>No hidden costs, no subscriptions, no premium tiers. All tools are completely free to use.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3>50+</h3>
+                            <p>Powerful Tools</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>100%</h3>
+                            <p>Free to Use</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>24/7</h3>
+                            <p>Available</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>0</h3>
+                            <p>Downloads Required</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Our Story -->
+                <div class="about-section">
+                    <h2><i class="fas fa-book"></i> Our Story</h2>
+                    <p>GenKit was born from a simple frustration: the need to constantly search for reliable, free tools scattered across the internet. As developers and digital professionals, we found ourselves bookmarking dozens of different websites, each offering a single utility we needed.</p>
+                    <p>We realized there was a need for a centralized platform that brings together all the essential digital tools in one place. So we built GenKit - a comprehensive toolkit that eliminates the need to search, compare, and test different tools from various sources.</p>
+                    <p>Today, GenKit serves thousands of users worldwide, from students and professionals to small businesses and large enterprises. We're constantly adding new tools and improving existing ones based on user feedback and emerging needs.</p>
+                </div>
+
+                <!-- Team Section -->
+                <div class="about-section team-section">
+                    <h2><i class="fas fa-users"></i> Our Team</h2>
+                    <p style="margin-bottom: 2rem;">GenKit is built and maintained by a passionate team of developers and designers who believe in the power of accessible technology.</p>
+                    <div class="team-member">
+                        <div class="team-avatar">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3>GenKit Team</h3>
+                        <p>A dedicated group of developers, designers, and digital enthusiasts working together to create the best possible user experience.</p>
+                    </div>
+                </div>
+
+                <!-- Values Section -->
+                <div class="about-section">
+                    <h2><i class="fas fa-compass"></i> Our Values</h2>
+                    <p><strong>Simplicity:</strong> We believe powerful tools don't have to be complicated. Our interfaces are clean, intuitive, and designed for users of all skill levels.</p>
+                    <p><strong>Reliability:</strong> You can count on GenKit to work when you need it. We maintain high uptime and constantly monitor our tools for optimal performance.</p>
+                    <p><strong>Innovation:</strong> We stay ahead of digital trends and continuously add new tools based on emerging user needs and technological advances.</p>
+                    <p><strong>Community:</strong> Our users are at the heart of everything we do. We listen to feedback and improve our platform based on real user experiences.</p>
+                </div>
+
+                <!-- CTA Section -->
+                <div class="cta-section">
+                    <h2>Ready to Simplify Your Digital Life?</h2>
+                    <p>Join thousands of users who trust GenKit for their daily digital needs.</p>
+                    <a href="index.html#tools" class="cta-button">Explore Tools</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">GenKit</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                    <p>Contact: <a href="mailto:toolsguy1@gmail.com" style="color: #2563eb;">toolsguy1@gmail.com</a></p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 1rem;">Quick Links</h4>
+                    <div class="footer-links">
+                        <a href="policy.html">Privacy Policy</a>
+                        <a href="terms.html">Terms of Use</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GenKit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
